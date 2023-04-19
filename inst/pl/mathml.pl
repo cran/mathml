@@ -865,21 +865,21 @@ math(invisible(_), M, _Flags)
 math(Hash, M),
     compound(Hash),
     compound_name_arguments(Hash, Name, Elements),
-    member(Name, ['#', '$$', '%', '!'])
+    member(Name, ['##', '$$', '%%', '!!'])
  => M = paren(Elements).
 
 % Matrices
 ml(Matrix, M, Flags),
     compound(Matrix),
     compound_name_arguments(Matrix, Name, Rows),
-    member(Name, ['##', '$$$', '%%', '!!'])
+    member(Name, ['###', '$$$', '%%%', '!!!'])
  => maplist(ml_row(Flags), Rows, R),
     M = mrow([mo('('), mtable(columnalign(left), R), mo(')')]).
 
 ml_row(Flags, Row, M),
     compound(Row),
     compound_name_arguments(Row, Name, Cells),
-    member(Name, ['#', '$$', '%', '!'])
+    member(Name, ['##', '$$', '%%', '!!'])
  => maplist(ml_cell(Flags), Cells, C),
     M = mtr(C).
 
@@ -890,7 +890,7 @@ ml_cell(Flags, Cell, M)
 jax(Matrix, M, Flags),
     compound(Matrix),
     compound_name_arguments(Matrix, Name, [Row1 | Rows]),
-    member(Name, ['##', '$$$', '%%', '!!'])
+    member(Name, ['###', '$$$', '%%%', '!!!'])
  => findall(c, arg(_, Row1, _), Ls),
     atomic_list_concat(Ls, LLL),
     maplist(jax_row(Flags), [Row1 | Rows], R),
@@ -900,7 +900,7 @@ jax(Matrix, M, Flags),
 jax_row(Flags, Row, M),
     compound(Row),
     compound_name_arguments(Row, Name, Cells),
-    member(Name, ['#', '$$', '%', '!'])
+    member(Name, ['##', '$$', '%%', '!!'])
  => maplist(jax_cell(Flags), Cells, C),
     atomic_list_concat(C, ' & ', R),
     format(string(M), "~w\\\\\n", [R]).

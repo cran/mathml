@@ -1,12 +1,12 @@
-c48efa3cd5a6de3cf26596b46a0b037c *DESCRIPTION
+665b87ad0c282441eb4542b8a0b112c0 *DESCRIPTION
 8e3d330cd8961a1bd4129f937708ec09 *NAMESPACE
 5cd6d86fd2744c84fa1c4997401ab808 *R/mathml.R
 53c3f328c44597814e584f312db63718 *README.md
 0a9ced695b2d0ce394b11d9784e3b0fb *build/vignette.rds
-86b502770b925e7563935ad7c9586c33 *inst/doc/mathml.R
-8c884be5ba99c18fd83109eaefc2e297 *inst/doc/mathml.Rmd
-96b98d0a5363ac87067292417cd8bf89 *inst/doc/mathml.html
-69aaca0682de4b2e389ced5cf5894560 *inst/pl/mathml.pl
+3d83e97d5264a0b025092977a94d651f *inst/doc/mathml.R
+0d4f98ba7c524cc5000f4202900675fd *inst/doc/mathml.Rmd
+3e096d560e6e14616e8061ce243b3c7c *inst/doc/mathml.html
+f201f2d77610e0efeacce067f9fa278a *inst/pl/mathml.pl
 fa7f79b2c5cba3ebc1171e1c25ca4e81 *man/add.Rd
 f5abeda43030e1450ea1e2b3c6a15d5e *man/add_left.Rd
 113a2934ae6de6b78ba42e7f92d32448 *man/add_right.Rd
@@ -47,6 +47,6 @@ de716f3cfea54a7ec8a31815bb820a51 *man/subscript.Rd
 7bd8848beddeee26675d3633acccf9f4 *man/subsupscript.Rd
 9d89a2761796e6b950416f0818b34dd9 *man/superscript.Rd
 468d5c76bc1f80a419a7d8c499851c6c *tests/testthat.R
-c2501d52a4b13631dd459f1a3b6ac576 *tests/testthat/test-mathml.R
-48d21ab392f4a8d0b48d34459da449b4 *vignettes/RJreferences.bib
-8c884be5ba99c18fd83109eaefc2e297 *vignettes/mathml.Rmd
+9e2b8e2a01d56f906b195dfacee19cd9 *tests/testthat/test-mathml.R
+7ea6f3c48a4bb6847529ee977b71e09d *vignettes/RJreferences.bib
+0d4f98ba7c524cc5000f4202900675fd *vignettes/mathml.Rmd

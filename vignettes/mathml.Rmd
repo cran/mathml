@@ -531,14 +531,16 @@ arguments into the renderer. For details, see the R\ function `match.call()`.
 
 Of course, _mathml_ also supports matrices and vectors.
 
-```{r, results='asis'}
-v <- 1:3
-mathout(call("t", v))
+No, sorry, it doesn't right now, please wait for rolog-0.9.12.
 
-A <- matrix(data=11:16, nrow=2, ncol=3)
-B <- matrix(data=21:26, nrow=2, ncol=3)
-term <- call("+", A, B)
-mathout(term)
+```{r, results='asis'}
+# v <- 1:3
+# mathout(call("t", v))
+# 
+# A <- matrix(data=11:16, nrow=2, ncol=3)
+# B <- matrix(data=21:26, nrow=2, ncol=3)
+# term <- call("+", A, B)
+# mathout(term)
 ```
 
 Note that the seemingly more convient `term <- quote(A + B)` yields \(A + B\) in

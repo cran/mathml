@@ -249,13 +249,13 @@ canonical(term)
 mathout(canonical(term))
 
 ## ---- results='asis'----------------------------------------------------------
-v <- 1:3
-mathout(call("t", v))
-
-A <- matrix(data=11:16, nrow=2, ncol=3)
-B <- matrix(data=21:26, nrow=2, ncol=3)
-term <- call("+", A, B)
-mathout(term)
+# v <- 1:3
+# mathout(call("t", v))
+# 
+# A <- matrix(data=11:16, nrow=2, ncol=3)
+# B <- matrix(data=21:26, nrow=2, ncol=3)
+# term <- call("+", A, B)
+# mathout(term)
 
 ## ---- results='asis'----------------------------------------------------------
 hook(m_A, mean(X)["A"]) ; hook(s2_A, s["A"]^2L) ;
