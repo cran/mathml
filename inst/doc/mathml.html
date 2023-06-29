@@ -369,24 +369,26 @@ Innsbruck, Department of Psychology)</h4>
 
 
 
-<p>The R extension of the markdown language <span class="citation">(Xie,
-Dervieux, and Riederer 2020)</span> enables reproducible statistical
-reports with nice typesetting in HTML, Microsoft Word, and Latex. Since
-recently <span class="citation">(R Core Team 2022, version 4.2)</span>,
-R&#39;s manual pages include support for mathematical expressions <span class="citation">(Sarkar and Hornik 2022; Viechtbauer 2022)</span>,
-which already is a big improvement. However, rules for the mapping of
-built-in language elements to their mathematical representation are
-still lacking. So far, R expressions such as
-<code>pbinom(k, N, p)</code> are printed as they are; pretty
+<p>The R extension of the markdown language <span class="citation">(Yihui Xie, Allaire, and Grolemund 2018; Allaire et al.
+2023)</span> enables reproducible statistical reports with nice
+typesetting in HTML, Microsoft Word, and LaTeX. Moreover, since recently
+<span class="citation">(R Core Team 2022, version 4.2)</span>, R&#39;s
+manual pages include support for mathematical expressions <span class="citation">(Sarkar and Hornik 2022; Viechtbauer 2022)</span>,
+which already is a big improvement. However, except for special cases
+such as regression models <span class="citation">(Anderson, Heiss, and
+Sumners 2023)</span> and R’s own plotmath annotation, rules for the
+mapping of built-in language elements to their mathematical
+representation are still lacking. So far, R expressions such as
+<code>pbinom(k, N, p)</code> are printed as they are and pretty
 mathematical formulae such as <span class="math inline">\(P_{\mathrm{Bi}}(X \le k; N, p)\)</span> require
-explicit Latex commands, that is,
-<code>P_{\mathrm{Bi}}\left(X \le k; N, p\right)</code>. Except for
-minimalistic use cases, these commands are tedious to type in and their
-source code is hard to read.</p>
-<p>The R package <code>mathml</code> defines a set of rules for the
-automatic translation of R expressions to mathematical output in
-RMarkdown documents <span class="citation">(Xie, Dervieux, and Riederer
-2020)</span> and ShinyApp webpages <span class="citation">(Chang et al.
+explicit LaTeX commands like
+<code>P_{\mathrm{Bi}}\left(X \le k; N, p\right)</code>. Except for very
+basic use cases, these commands are tedious to type in and their source
+code is hard to read.</p>
+<p>The present R package defines a set of rules for the automatic
+translation of R expressions to mathematical output in R Markdown
+documents <span class="citation">(Y. Xie, Dervieux, and Riederer
+2020)</span> and Shiny Apps <span class="citation">(Chang et al.
 2022)</span>. The translation is done by an embedded Prolog interpreter
 that maps nested expressions recursively to MathML and LaTeX/MathJax,
 respectively. User-defined hooks enable to extend the set of rules, for
@@ -394,25 +396,20 @@ example, to represent specific R elements by custom mathematical
 signs.</p>
 <p>The main feature of the package is that the same R expressions and
 equations can be used for both mathematical typesetting and
-calculations. This saves time and reduces mistakes, as will be
-illustrated below.</p>
-<p>The translation of R expressions to mathematical output is achieved
-through a Prolog interpreter from R package <em>rolog</em> <span class="citation">(Gondan 2022)</span>. Prolog is a classical logic
-programming language with many applications in expert systems, computer
-linguistics and symbolic artificial intelligence. The main strength of
-Prolog is its concise representation of facts and rules for knowledge
-and grammar, as well as its efficient built-in search engine for closed
-world domains. As it is well-known, R is a statistical programming
-language for data analysis and statistical modeling. Whereas Prolog is
-weak in statistical computation, but strong in symbolic manipulation,
-the converse may be said for the R language. The <em>rolog</em> package
-bridges this gap by providing an interface to a SWI-Prolog distribution
-<span class="citation">(Wielemaker et al. 2012)</span> in R. The
-communication between the two systems is mainly in the form of queries
-from R to Prolog, but two predicates allow Prolog to ring back and
-evaluate terms in R.</p>
-<p>For a first illustration of the <em>mathml</em> package, we consider
-the binomial probability.</p>
+calculations. This saves time and potentially reduces mistakes, as will
+be illustrated below.</p>
+<p>Similar to other high-level programming languages, R is homoiconic,
+that is, R commands (i.e., R “calls”) are, themselves, symbolic data
+structures that can be created, parsed and modified. Because the default
+response of the R interpreter is to evaluate a call and return its
+result, this property is not transparent to the general user. There
+exists, however, a number of built-in R functions (e.g.,
+<code>quote()</code>, <code>call()</code> etc.) that allow the user to
+create R calls which can be stored in regular variables and then, for
+example, evaluated at a later stage or in a specific environment <span class="citation">(Wickham 2019)</span>. The present package includes a
+set of rules that translate such calls to a mathematical representation
+in MathML and LaTeX. For a first illustration of the <em>mathml</em>
+package, we consider the binomial probability.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pbinom</span>(k, N, p))</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>term</span></code></pre></div>
 <pre><code>## pbinom(k, N, p)</code></pre>
@@ -422,9 +419,9 @@ raise an error anyway since the variables <code>k</code>,
 readers will remember that the quoted expression above is a short form
 for</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">call</span>(<span class="st">&quot;pbinom&quot;</span>, <span class="fu">as.name</span>(<span class="st">&quot;k&quot;</span>), <span class="fu">as.name</span>(<span class="st">&quot;N&quot;</span>), <span class="fu">as.name</span>(<span class="st">&quot;p&quot;</span>))</span></code></pre></div>
-<p>As is seen from the output above, the variable <code>term</code> is
-not assigned the result of the calculation, but an R call <span class="citation">(see, e.g., Wickham 2019, for details on “non-standard
-evaluation”)</span>. Such a call can eventually be evaluated with
+<p>As it can be seen from the output, to the variable <code>term</code>
+is not assigned the result of the calculation, yet an R call <span class="citation">(see, e.g., Wickham 2019, for details on “non-standard
+evaluation”)</span>, which can eventually be evaluated with
 <code>eval()</code>,</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">22</span></span>
@@ -439,51 +436,39 @@ cases).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mathml)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathjax</span>(term)</span></code></pre></div>
 <pre><code>## [1] &quot;${P}_{\\mathrm{Bi}}{\\left({{X}{\\le}{k}}{{;}{{N}{{,}{p}}}}\\right)}$&quot;</code></pre>
-<p>We can include the output in a RMarkdown document by specifying
-<code>results=&#39;asis&#39;</code> in the R code chunk, as is done in the next
-example. The R function <code>mathout()</code> has been defined in this
-vignette; it invokes <code>mathml()</code> for HTML output and
-<code>mathjax()</code> for LaTeX output.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<p>Some of the curly braces are not really needed in the LaTeX output,
+but are necessary in edge cases. The package also includes a function
+<code>mathout()</code> that wraps a call to <code>mathml()</code> for
+HTML output and <code>mathjax()</code> for LaTeX output. Moreover, the
+function <code>math(x)</code> adds the class <code>&quot;math&quot;</code> to its
+argument, such that a special knitr printing function is invoked. We can
+include the output in a R Markdown document by specifying
+<code>results=&quot;asis&quot;</code> in the R code chunk of R Markdown, as is
+done in all examples below.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="in">````{r, results=&quot;asis&quot;}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="in">math(term)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span></code></pre></div>
 <p><math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>≤</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>p</mi></mrow></mrow><mo>)</mo></mrow></mrow></math></p>
-<p>At the Prolog end, a predicate <code>math/2</code> translates the
-call <code>pbinom(K, N, Pi)</code> into a “function” <code>fn/2</code>
-with the name <code>P_Bi</code>, one argument <code>X =&lt; K</code>,
-and the two parameters <code>N</code> and <code>Pi</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>math(pbinom(<span class="dt">K</span><span class="kw">,</span> <span class="dt">N</span><span class="kw">,</span> <span class="dt">Pi</span>)<span class="kw">,</span> <span class="dt">M</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a> =&gt; <span class="dt">M</span> <span class="kw">=</span> fn(subscript(<span class="st">&#39;</span><span class="er">P</span><span class="st">&#39;</span><span class="kw">,</span> <span class="ot">&quot;</span><span class="er">Bi</span><span class="ot">&quot;</span>)<span class="kw">,</span> ([<span class="st">&#39;</span><span class="er">X</span><span class="st">&#39;</span> <span class="dt">=&lt;</span> <span class="dt">K</span>] <span class="kw">;</span> [<span class="dt">N</span>, <span class="dt">Pi</span>]))<span class="kw">.</span></span></code></pre></div>
-<p>Thus, the predicate <code>math/2</code> could be considered a “macro”
-that translates a mathematical element (here,
-<code>pbinom(K, N, Pi)</code>) to a different mathematical element,
-namely <code>fn(Name, (Args ; Pars))</code>. The low-level predicate
-<code>ml/3</code> is used to convert these basic elements to MathML.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ml(<span class="dt">Flags</span><span class="kw">,</span> fn(<span class="dt">Name</span><span class="kw">,</span> (<span class="dt">Args</span> <span class="kw">;</span> <span class="dt">Pars</span>))<span class="kw">,</span> <span class="dt">M</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a> =&gt; ml(<span class="dt">Flags</span><span class="kw">,</span> <span class="dt">Name</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    ml(<span class="dt">Flags</span><span class="kw">,</span> paren(list(<span class="fu">op</span>(<span class="kw">;</span>)<span class="kw">,</span> [list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Args</span>), list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Pars</span>)]))<span class="kw">,</span> <span class="dt">X</span>)<span class="kw">,</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mrow([<span class="dt">N</span>, mo(&amp;(af)), <span class="dt">X</span>])<span class="kw">.</span></span></code></pre></div>
-<p>The relevant rule for <code>ml/3</code> builds the MathML entity
-<code>mrow([N, mo(&amp;(af)), X])</code>, with <code>N</code>
-representing the name of the function and <code>X</code> its arguments
-and parameters, enclosed in parentheses. A corresponding rule
-<code>jax/3</code> does the same for MathJax/LaTeX. A list of flags can
-be used for context-sensitive translation (see, e.g., the section on
-errors below).</p>
+<p>Similarly, <code>inline()</code> produces inline output,
+<code>`r inline(term)`</code> yields
+<math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>≤</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>p</mi></mrow></mrow><mo>)</mo></mrow></mrow></math>.</p>
 <div id="package-mathml-in-practice" class="section level1">
 <h1>Package <em>mathml</em> in practice</h1>
 <p><em>mathml</em> is an R package for pretty mathematical
 representation of R functions and objects in data analysis, scientific
 reports and interactive web content. The currently supported features
-are listed below, roughly following the order proposed by <span class="citation">(Murrell and Ihaka 2000)</span>.</p>
+are listed below, roughly following the order proposed by Murrell and
+Ihaka <span class="citation">(2000)</span>.</p>
 <div id="basic-elements" class="section level2">
 <h2>Basic elements</h2>
 <p><em>mathml</em> handles the basic elements of everyday mathematical
 expressions, such as numbers, Latin and Greek letters, multi-letter
 identifiers, accents, subscripts, and superscripts.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="sc">-</span>2L <span class="sc">+</span> a <span class="sc">+</span> abc <span class="sc">+</span> <span class="st">&quot;a&quot;</span> <span class="sc">+</span> phi <span class="sc">+</span> Phi <span class="sc">+</span> varphi <span class="sc">+</span> <span class="fu">roof</span>(b)[i, j]<span class="sc">^</span>2L)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="sc">-</span>2L <span class="sc">+</span> a <span class="sc">+</span> abc <span class="sc">+</span> <span class="st">&quot;a&quot;</span> <span class="sc">+</span> phi <span class="sc">+</span> Phi <span class="sc">+</span> varphi <span class="sc">+</span> <span class="fu">roof</span>(b)[i, j]<span class="sc">^</span>2L)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mrow><mrow><mrow><mrow><mn>1.00</mn><mo>+</mo><mrow><mo>-</mo><mn>2</mn></mrow></mrow><mo>+</mo><mi>a</mi></mrow><mo>+</mo><mi>abc</mi></mrow><mo>+</mo><mtext>a</mtext></mrow><mo>+</mo><mi>φ</mi></mrow><mo>+</mo><mi>Φ</mi></mrow><mo>+</mo><mi>ϕ</mi></mrow><mo>+</mo><msubsup><mover accent="true"><mi>b</mi><mo>^</mo></mover><mrow><mi>i</mi><mtext></mtext><mi>j</mi></mrow><mn>2</mn></msubsup></mrow></math></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">round</span>(<span class="fl">3.1415</span>, 3L) <span class="sc">+</span> <span class="cn">NaN</span> <span class="sc">+</span> <span class="cn">NA</span> <span class="sc">+</span> <span class="cn">TRUE</span> <span class="sc">+</span> <span class="cn">FALSE</span> <span class="sc">+</span> <span class="cn">Inf</span> <span class="sc">+</span> (<span class="sc">-</span><span class="cn">Inf</span>))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">round</span>(<span class="fl">3.1415</span>, 3L) <span class="sc">+</span> <span class="cn">NaN</span> <span class="sc">+</span> <span class="cn">NA</span> <span class="sc">+</span> <span class="cn">TRUE</span> <span class="sc">+</span> <span class="cn">FALSE</span> <span class="sc">+</span> <span class="cn">Inf</span> <span class="sc">+</span> (<span class="sc">-</span><span class="cn">Inf</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mrow><mrow><mn>3.142</mn><mo>+</mo><mn>nan</mn></mrow><mo>+</mo><mi>na</mi></mrow><mo>+</mo><mi>T</mi></mrow><mo>+</mo><mi>F</mi></mrow><mo>+</mo><mi>∞</mi></mrow><mo>+</mo><mrow><mo>(</mo><mrow><mo>-</mo><mi>∞</mi></mrow><mo>)</mo></mrow></mrow></math></p>
 <p>An expression such as <code>1 + -2</code> may be considered
 unsatisfactory from an aesthetical perspective. It is correct R syntax,
@@ -502,11 +487,11 @@ by the package for convenience and points to the identity function.</p>
 accents and boxes etc. Internally, these decorations are implemented as
 identity functions, so they can be introduced into R expressions without
 side-effects.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">bold</span>(b[x, 5L]) <span class="sc">+</span> <span class="fu">bold</span>(b[<span class="fu">italic</span>(x)]) <span class="sc">+</span> <span class="fu">italic</span>(ab) <span class="sc">+</span> <span class="fu">italic</span>(42L))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">bold</span>(b[x, 5L]) <span class="sc">+</span> <span class="fu">bold</span>(b[<span class="fu">italic</span>(x)]) <span class="sc">+</span> <span class="fu">italic</span>(ab) <span class="sc">+</span> <span class="fu">italic</span>(42L))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><msub><mi mathvariant="bold">b</mi><mrow><mi mathvariant="bold">x</mi><mtext></mtext><mn>5</mn></mrow></msub><mo>+</mo><msub><mi mathvariant="bold">b</mi><mi mathvariant="italic">x</mi></msub></mrow><mo>+</mo><mi mathvariant="italic">ab</mi></mrow><mo>+</mo><mn>42</mn></mrow></math></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">tilde</span>(a) <span class="sc">+</span> <span class="fu">mean</span>(X) <span class="sc">+</span> <span class="fu">boxed</span>(c) <span class="sc">+</span> <span class="fu">cancel</span>(d) <span class="sc">+</span> <span class="fu">phantom</span>(e) <span class="sc">+</span> <span class="fu">prime</span>(f))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">tilde</span>(a) <span class="sc">+</span> <span class="fu">mean</span>(X) <span class="sc">+</span> <span class="fu">boxed</span>(c) <span class="sc">+</span> <span class="fu">cancel</span>(d) <span class="sc">+</span> <span class="fu">phantom</span>(e) <span class="sc">+</span> <span class="fu">prime</span>(f))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mrow><mover accent="true"><mi>a</mi><mo>˜</mo></mover><mo>+</mo><mover accent="true"><mi>X</mi><mo>¯</mo></mover></mrow><mo>+</mo><menclose notation="roundedbox"><mi>c</mi></menclose></mrow><mo>+</mo><menclose notation="updiagonalstrike"><mi>d</mi></menclose></mrow><mo>+</mo><mphantom><mi>e</mi></mphantom></mrow><mo>+</mo><msup><mi>f</mi><mo>′</mo></msup></mrow></math></p>
 <p>Note that the font styles only affect the display of identifiers,
 whereas numbers, character strings etc. are left untouched.</p>
@@ -515,11 +500,11 @@ whereas numbers, character strings etc. are left untouched.</p>
 <h2>Operators and parentheses</h2>
 <p>Arithmetic operators and parentheses are translated as they are, as
 illustrated below.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a <span class="sc">-</span> ((b <span class="sc">+</span> c)) <span class="sc">-</span> d<span class="sc">*</span>e <span class="sc">+</span> f<span class="sc">*</span>(g <span class="sc">+</span> h) <span class="sc">+</span> i<span class="sc">/</span>j <span class="sc">+</span> k<span class="sc">^</span>(l <span class="sc">+</span> m) <span class="sc">+</span> (n<span class="sc">*</span>o)<span class="sc">^</span>{p <span class="sc">+</span> q})</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a <span class="sc">-</span> ((b <span class="sc">+</span> c)) <span class="sc">-</span> d<span class="sc">*</span>e <span class="sc">+</span> f<span class="sc">*</span>(g <span class="sc">+</span> h) <span class="sc">+</span> i<span class="sc">/</span>j <span class="sc">+</span> k<span class="sc">^</span>(l <span class="sc">+</span> m) <span class="sc">+</span> (n<span class="sc">*</span>o)<span class="sc">^</span>{p <span class="sc">+</span> q})</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mrow><mrow><mi>a</mi><mo>-</mo><mrow><mo>[</mo><mrow><mo>(</mo><mrow><mi>b</mi><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>]</mo></mrow></mrow><mo>-</mo><mrow><mi>d</mi><mo>⁢</mo><mi>e</mi></mrow></mrow><mo>+</mo><mrow><mi>f</mi><mo>⋅</mo><mrow><mo>(</mo><mrow><mi>g</mi><mo>+</mo><mi>h</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>i</mi><mo>/</mo><mi>j</mi></mrow></mrow><mo>+</mo><msup><mi>k</mi><mrow><mo>(</mo><mrow><mi>l</mi><mo>+</mo><mi>m</mi></mrow><mo>)</mo></mrow></msup></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>n</mi><mo>⁢</mo><mi>o</mi></mrow><mo>)</mo></mrow><mrow><mi>p</mi><mo>+</mo><mi>q</mi></mrow></msup></mrow></math></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dot</span>(a, b) <span class="sc">+</span> <span class="fu">frac</span>(1L, <span class="fu">nodot</span>(c, d <span class="sc">+</span> e)) <span class="sc">+</span> <span class="fu">dfrac</span>(1L, <span class="fu">times</span>(g, h)))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dot</span>(a, b) <span class="sc">+</span> <span class="fu">frac</span>(1L, <span class="fu">nodot</span>(c, d <span class="sc">+</span> e)) <span class="sc">+</span> <span class="fu">dfrac</span>(1L, <span class="fu">times</span>(g, h)))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mi>a</mi><mo>⋅</mo><mi>b</mi></mrow><mo>+</mo><mfrac><mn>1</mn><mrow><mi>c</mi><mo>⁢</mo><mrow><mo>(</mo><mrow><mi>d</mi><mo>+</mo><mi>e</mi></mrow><mo>)</mo></mrow></mrow></mfrac></mrow><mo>+</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><mi>g</mi><mo>×</mo><mi>h</mi></mrow></mfrac></mstyle></mrow></math></p>
 <p>For multiplications involving only numbers and symbols, the
 multiplication sign is omitted. This heuristic does not always produce
@@ -530,14 +515,14 @@ the respective multiplication signs. Similarly, <code>frac()</code> and
 <code>dfrac()</code> can be used for small and large fractions.</p>
 <p>For standard operators with known precedence, <em>mathml</em> is
 generally able to detect if parentheses are needed; for example,
-parentheses are automatically placed around <code>g + h</code> in the
+parentheses are automatically placed around <code>d + e</code> in the
 <code>nodot</code>-example. However, we note unnecessary parentheses
 around <code>l + m</code> above. Thes parentheses are a consequence of
 <code>quote(a^(b + c))</code> actually producing a nested R call of the
 form <code>&#39;^&#39;(a, (b + c))</code> instead of
 <code>&#39;^&#39;(a, b + c)</code>:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a<span class="sc">^</span>(b <span class="sc">+</span> c))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a<span class="sc">^</span>(b <span class="sc">+</span> c))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(term)</span></code></pre></div>
 <pre><code>## [1] &quot;^&quot;       &quot;a&quot;       &quot;(b + c)&quot;</code></pre>
 <p>For the present purpose, this feature is unfortunate because extra
 parentheses around <code>b + c</code> are not needed. The preferred
@@ -550,12 +535,12 @@ workaround (see <code>p + q</code> above).</p>
 <p>Whereas in standard infix operators, the parentheses typically follow
 the rules for precedence, undesirable results may be obtained in custom
 operators.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">mean</span>(X) <span class="sc">%+-%</span> <span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">mean</span>(X) <span class="sc">%+-%</span> <span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mo>(</mo><mrow><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mo>±</mo><mn>1.96</mn></mrow><mo>)</mo></mrow><mo>⋅</mo><mi>s</mi></mrow><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></math></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="st">&#39;%+-%&#39;</span>(<span class="fu">mean</span>(X), <span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N))) <span class="co"># functional form of &#39;%+-%&#39;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">mean</span>(X) <span class="sc">%+-%</span> {<span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N)})   <span class="co"># the same</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="st">&#39;%+-%&#39;</span>(<span class="fu">mean</span>(X), <span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N))) <span class="co"># functional form of &#39;%+-%&#39;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">mean</span>(X) <span class="sc">%+-%</span> {<span class="fl">1.96</span> <span class="sc">*</span> s <span class="sc">/</span> <span class="fu">sqrt</span>(N)})   <span class="co"># the same</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mo>±</mo><mrow><mrow><mn>1.96</mn><mo>⁢</mo><mi>s</mi></mrow><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></mrow></math></p>
 <p>The example is a reminder that it is not possible to define the
 precedence of custom operators in R, and that expressions with such
@@ -682,11 +667,11 @@ annotations and arrows in R figures.</p>
 <h2>Builtin functions</h2>
 <p>There is support for most functions from package <em>base</em>, with
 adequate use and omission of parentheses.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">sin</span>(x) <span class="sc">+</span> <span class="fu">sin</span>(x)<span class="sc">^</span>2L <span class="sc">+</span> <span class="fu">cos</span>(pi<span class="sc">/</span>2L) <span class="sc">+</span> <span class="fu">tan</span>(2L<span class="sc">*</span>pi) <span class="sc">*</span> <span class="fu">expm1</span>(x))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">sin</span>(x) <span class="sc">+</span> <span class="fu">sin</span>(x)<span class="sc">^</span>2L <span class="sc">+</span> <span class="fu">cos</span>(pi<span class="sc">/</span>2L) <span class="sc">+</span> <span class="fu">tan</span>(2L<span class="sc">*</span>pi) <span class="sc">*</span> <span class="fu">expm1</span>(x))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mi>sin</mi><mo>⁡</mo><mi>x</mi></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>sin</mi><mo>⁡</mo><mi>x</mi></mrow><mo>)</mo></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mi>cos</mi><mo>⁡</mo><mrow><mo>(</mo><mrow><mi>π</mi><mo>/</mo><mn>2</mn></mrow><mo>)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mrow><mi>tan</mi><mo>⁡</mo><mrow><mo>(</mo><mrow><mn>2</mn><mo>⁢</mo><mi>π</mi></mrow><mo>)</mo></mrow></mrow><mo>⋅</mo><mrow><mo>(</mo><mrow><mrow><mi>exp</mi><mo>⁡</mo><mi>x</mi></mrow><mo>-</mo><mn>1</mn></mrow><mo>)</mo></mrow></mrow></mrow></math></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">choose</span>(N, k) <span class="sc">+</span> <span class="fu">abs</span>(x) <span class="sc">+</span> <span class="fu">sqrt</span>(x) <span class="sc">+</span> <span class="fu">floor</span>(x) <span class="sc">+</span> <span class="fu">exp</span>(<span class="fu">frac</span>(x, y)))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">choose</span>(N, k) <span class="sc">+</span> <span class="fu">abs</span>(x) <span class="sc">+</span> <span class="fu">sqrt</span>(x) <span class="sc">+</span> <span class="fu">floor</span>(x) <span class="sc">+</span> <span class="fu">exp</span>(<span class="fu">frac</span>(x, y)))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mrow><mrow><mrow><mo>(</mo><mfrac linethickness="0"><mi>N</mi><mi>k</mi></mfrac><mo>)</mo></mrow><mo>+</mo><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mrow><mo>+</mo><msqrt><mi>x</mi></msqrt></mrow><mo>+</mo><mrow><mo>⌊</mo><mi>x</mi><mo>⌋</mo></mrow></mrow><mo>+</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mfrac><mi>x</mi><mi>y</mi></mfrac><mo>)</mo></mrow></mrow></mrow></math></p>
 <p>A few more examples are shown in Table 2, including functions from
 <em>stats</em>.</p>
@@ -809,21 +794,22 @@ adequate use and omission of parentheses.</p>
 </div>
 <div id="custom-functions" class="section level2">
 <h2>Custom functions</h2>
-<p>For self-written functions, matters are a bit more complicated. For a
-function such as <code>g &lt;- function(...) ...</code>, the name
+<p>For self-written functions, the matter is somewhat more complicated.
+For a function such as <code>g &lt;- function(...) ...</code>, the name
 <em>g</em> is not transparent to R, because only the function body is
-represented, as illustrated by the redefinition of <code>sign</code>
-below.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sgn <span class="ot">&lt;-</span> <span class="cf">function</span>(x)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">==</span> 0L) <span class="fu">return</span>(0L)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">&lt;</span> 0L) <span class="fu">return</span>(<span class="sc">-</span>1L)</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">&gt;</span> 0L) <span class="fu">return</span>(1L)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(sgn)</span></code></pre></div>
+represented. We can still display functions in the form
+<code>head(x) = body</code> if we embed the object to be shown into a
+call <code>&quot;&lt;-&quot;(head, body)</code>.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sgn <span class="ot">&lt;-</span> <span class="cf">function</span>(x)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">==</span> 0L) <span class="fu">return</span>(0L)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">&lt;</span> 0L) <span class="fu">return</span>(<span class="sc">-</span>1L)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">&gt;</span> 0L) <span class="fu">return</span>(1L)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(sgn)</span></code></pre></div>
 <p><math><mrow><mo>{</mo><mtable columnalign="left"><mrow><mn>0</mn><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow></mrow><mrow><mrow><mo>-</mo><mn>1</mn></mrow><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow></mrow><mrow><mn>1</mn><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>&gt;</mo><mn>0</mn></mrow></mrow></mtable></mrow></math></p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">call</span>(<span class="st">&quot;&lt;-&quot;</span>, <span class="fu">quote</span>(<span class="fu">sgn</span>(x)), sgn))</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">call</span>(<span class="st">&quot;&lt;-&quot;</span>, <span class="fu">quote</span>(<span class="fu">sgn</span>(x)), sgn))</span></code></pre></div>
 <p><math><mrow><mrow><mi>sgn</mi><mo>⁡</mo><mi>x</mi></mrow><mo>=</mo><mrow><mo>{</mo><mtable columnalign="left"><mrow><mn>0</mn><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow></mrow><mrow><mrow><mo>-</mo><mn>1</mn></mrow><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow></mrow><mrow><mn>1</mn><mtext>,</mtext><mspace width="thinmathspace"></mspace><mtext>if</mtext><mspace width="thinmathspace"></mspace><mrow><mi>x</mi><mo>&gt;</mo><mn>0</mn></mrow></mrow></mtable></mrow></mrow></math></p>
 <p>As shown in the example, we can still display functions in the form
 <code>head(x) = body</code> if we embed the object to be shown into a
@@ -842,11 +828,11 @@ rendered as superscript. Moreover, <em>mathml</em> defines the functions
 <code>prod_over(x, from, to)</code> that simply return their first
 argument. The other two arguments serve as decorations (<em>to</em> is
 optional), for example, for summation and product signs.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(S[Y]<span class="sc">^</span>2L <span class="ot">&lt;-</span> <span class="fu">frac</span>(1L, N) <span class="sc">*</span> <span class="fu">sum</span>(Y[i] <span class="sc">-</span> <span class="fu">mean</span>(Y))<span class="sc">^</span>2L)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(S[Y]<span class="sc">^</span>2L <span class="ot">&lt;-</span> <span class="fu">frac</span>(1L, N) <span class="sc">*</span> <span class="fu">sum</span>(Y[i] <span class="sc">-</span> <span class="fu">mean</span>(Y))<span class="sc">^</span>2L)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><msubsup><mi>S</mi><mi>Y</mi><mn>2</mn></msubsup><mo>=</mo><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><mo>⋅</mo><msup><mrow><mo>∑</mo><mo>⁡</mo><mrow><mo>(</mo><mrow><msub><mi>Y</mi><mi>i</mi></msub><mo>-</mo><mover accent="true"><mi>Y</mi><mo>¯</mo></mover></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup></mrow></mrow></math></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">log</span>(<span class="fu">prod_over</span>(L[i], i<span class="sc">==</span>1L, N)) <span class="ot">&lt;-</span> <span class="fu">sum_over</span>(<span class="fu">log</span>(L[i]), i<span class="sc">==</span>1L, N))</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">log</span>(<span class="fu">prod_over</span>(L[i], i<span class="sc">==</span>1L, N)) <span class="ot">&lt;-</span> <span class="fu">sum_over</span>(<span class="fu">log</span>(L[i]), i<span class="sc">==</span>1L, N))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mi>log</mi><mo>⁡</mo><mrow><msubsup><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup><mo>⁡</mo><msub><mi>L</mi><mi>i</mi></msub></mrow></mrow><mo>=</mo><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup><mo>⁡</mo><mrow><mi>log</mi><mo>⁡</mo><msub><mi>L</mi><mi>i</mi></msub></mrow></mrow></mrow></math></p>
 </div>
 <div id="ringing-back-to-r" class="section level2">
@@ -854,10 +840,10 @@ optional), for example, for summation and product signs.</p>
 <p>R&#39;s <code>integrate</code> function takes a number of arguments, the
 most important ones being the function to integrate, and the lower and
 the upper bound of the integration.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">integrate</span>(sin, 0L, 2L<span class="sc">*</span>pi))</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">integrate</span>(sin, 0L, 2L<span class="sc">*</span>pi))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><munderover><mo>∫</mo><mn>0</mn><mrow><mn>2</mn><mo>⁢</mo><mi>π</mi></mrow></munderover><mrow><mi>sin</mi><mo>⁡</mo><mi>x</mi></mrow><mspace width="thinmathspace"></mspace><mi>d</mi><mi>x</mi></mrow></math></p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>(term)</span></code></pre></div>
 <p>2.221501e-16 with absolute error &lt; 4.4e-14</p>
 <p>For mathematical typesetting in the form of <span class="math inline">\(\int f(x)\, dx\)</span>, <em>mathml</em> needs to
 find out the name of the integration variable. For that purpose, the
@@ -887,10 +873,10 @@ in unusual order, <em>mathml</em> provides an auxiliary R function
 <code>canonical(f, drop)</code> that reorders the argument list of calls
 to known R functions and, if <code>drop=TRUE</code> (which is the
 default), also removes the names of the arguments.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">integrate</span>(<span class="at">lower=</span>0L, <span class="at">upper=</span>2L<span class="sc">*</span>pi, sin))</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">canonical</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">integrate</span>(<span class="at">lower=</span>0L, <span class="at">upper=</span>2L<span class="sc">*</span>pi, sin))</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">canonical</span>(term)</span></code></pre></div>
 <pre><code>## integrate(sin, 0L, 2L * pi)</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">canonical</span>(term))</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">canonical</span>(term))</span></code></pre></div>
 <p><math><mrow><munderover><mo>∫</mo><mn>0</mn><mrow><mn>2</mn><mo>⁢</mo><mi>π</mi></mrow></munderover><mrow><mi>sin</mi><mo>⁡</mo><mi>x</mi></mrow><mspace width="thinmathspace"></mspace><mi>d</mi><mi>x</mi></mrow></math></p>
 <p>This function can be used to feed mixtures of partially named and
 positional arguments into the renderer. For details, see the R function
@@ -899,13 +885,13 @@ positional arguments into the renderer. For details, see the R function
 <div id="matrices-and-vectors" class="section level2">
 <h2>Matrices and Vectors</h2>
 <p>Of course, <em>mathml</em> also supports matrices and vectors.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">call</span>(<span class="st">&quot;t&quot;</span>, v))</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(<span class="fu">call</span>(<span class="st">&quot;t&quot;</span>, v))</span></code></pre></div>
 <p><math><msup><mrow><mo>(</mo><mrow><mn>1</mn><mspace width="thinmathspace"></mspace><mn>2</mn><mspace width="thinmathspace"></mspace><mn>3</mn></mrow><mo>)</mo></mrow><mtext>T</mtext></msup></math></p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">data=</span><span class="dv">11</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">3</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">data=</span><span class="dv">21</span><span class="sc">:</span><span class="dv">26</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">3</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">call</span>(<span class="st">&quot;+&quot;</span>, A, B)</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">data=</span><span class="dv">11</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">3</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">data=</span><span class="dv">21</span><span class="sc">:</span><span class="dv">26</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">3</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">call</span>(<span class="st">&quot;+&quot;</span>, A, B)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mo>(</mo><mtable columnalign="left"><mtr><mtd><mn>11</mn></mtd><mtd><mn>13</mn></mtd><mtd><mn>15</mn></mtd></mtr><mtr><mtd><mn>12</mn></mtd><mtd><mn>14</mn></mtd><mtd><mn>16</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mtable columnalign="left"><mtr><mtd><mn>21</mn></mtd><mtd><mn>23</mn></mtd><mtd><mn>25</mn></mtd></mtr><mtr><mtd><mn>22</mn></mtd><mtd><mn>24</mn></mtd><mtd><mn>26</mn></mtd></mtr></mtable><mo>)</mo></mrow></mrow></math></p>
 <p>Note that the seemingly more convenient
 <code>term &lt;- quote(A + B)</code> yields <span class="math inline">\(A + B\)</span> in the output—instead of the
@@ -918,11 +904,11 @@ quotation of R calls also quote the components of the call (here,
 <p>In typical R functions, variable names are typically longer than just
 single letters, which may yield unsatisfactory results in the
 mathematical output.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(successes, k)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">quote</span>(Ntotal), <span class="fu">quote</span>(N), <span class="at">quote=</span><span class="cn">FALSE</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(prob, pi)</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dbinom</span>(successes, Ntotal, prob))</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(successes, k)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">quote</span>(Ntotal), <span class="fu">quote</span>(N), <span class="at">quote=</span><span class="cn">FALSE</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(prob, pi)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dbinom</span>(successes, Ntotal, prob))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>=</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>π</mi></mrow></mrow><mo>)</mo></mrow></mrow></math></p>
 <p>To improve the situation, <em>mathml</em> provides a simple hook that
 can be used to replace elements (e.g., verbose variable names) of the
@@ -935,8 +921,8 @@ recursive hooks such as <code>hook(s, s[&quot;A&quot;])</code> that endlessly
 replace the <span class="math inline">\(s\)</span> from <span class="math inline">\(s_{\mathrm{A}}\)</span> as in <span class="math inline">\(s_{\mathrm{A}_{\mathrm{A}_{\mathrm{A}\cdots}}}\)</span>.</p>
 <p>The hooks can also be used for more complex elements such as R calls,
 with dotted symbols representing Prolog variables.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">pbinom</span>(.K, .N, .P), <span class="fu">sum_over</span>(<span class="fu">dbinom</span>(i, .N, .P), <span class="at">i=</span>0L, .K))</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">pbinom</span>(.K, .N, .P), <span class="fu">sum_over</span>(<span class="fu">dbinom</span>(i, .N, .P), <span class="at">i=</span>0L, .K))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>=</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>π</mi></mrow></mrow><mo>)</mo></mrow></mrow></math></p>
 </div>
 <div id="abbreviations" class="section level2">
@@ -949,22 +935,22 @@ comment is given with the expression for <span class="math inline">\(s^2_{\mathr
 <code>denote(abbr, expr, info)</code>, with <code>expr</code> actually
 being evaluated, <code>abbr</code> being rendered, plus a comment of the
 form “with <code>expr</code> denoting <code>info</code>”.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(m_A, <span class="fu">mean</span>(X)[<span class="st">&quot;A&quot;</span>]) ; <span class="fu">hook</span>(s2_A, s[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L) ;</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(n_A, n[<span class="st">&quot;A&quot;</span>])</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(m_B, <span class="fu">mean</span>(X)[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_B, s[<span class="st">&quot;B&quot;</span>]<span class="sc">^</span>2L)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(n_B, n[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_p, s[<span class="st">&quot;pool&quot;</span>]<span class="sc">^</span>2L)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(t <span class="ot">&lt;-</span> <span class="fu">dfrac</span>(m_A <span class="sc">-</span> m_B, </span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sqrt</span>(<span class="fu">denote</span>(s2_p, <span class="fu">frac</span>((n_A <span class="sc">-</span> 1L)<span class="sc">*</span>s2_A <span class="sc">+</span> (n_B <span class="sc">-</span> 1L)<span class="sc">*</span>s2_B, n_A <span class="sc">+</span> n_B <span class="sc">-</span> 2L),</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;the pooled variance.&quot;</span>) <span class="sc">*</span> (<span class="fu">frac</span>(1L, n_A) <span class="sc">+</span> <span class="fu">frac</span>(1L, n_B)))))</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(m_A, <span class="fu">mean</span>(X)[<span class="st">&quot;A&quot;</span>]) ; <span class="fu">hook</span>(s2_A, s[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L) ;</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(n_A, n[<span class="st">&quot;A&quot;</span>])</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(m_B, <span class="fu">mean</span>(X)[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_B, s[<span class="st">&quot;B&quot;</span>]<span class="sc">^</span>2L)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(n_B, n[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_p, s[<span class="st">&quot;pool&quot;</span>]<span class="sc">^</span>2L)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(t <span class="ot">&lt;-</span> <span class="fu">dfrac</span>(m_A <span class="sc">-</span> m_B, </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sqrt</span>(<span class="fu">denote</span>(s2_p, <span class="fu">frac</span>((n_A <span class="sc">-</span> 1L)<span class="sc">*</span>s2_A <span class="sc">+</span> (n_B <span class="sc">-</span> 1L)<span class="sc">*</span>s2_B, n_A <span class="sc">+</span> n_B <span class="sc">-</span> 2L),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;the pooled variance.&quot;</span>) <span class="sc">*</span> (<span class="fu">frac</span>(1L, n_A) <span class="sc">+</span> <span class="fu">frac</span>(1L, n_B)))))</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>t</mi><mo>=</mo><mstyle displaystyle="true"><mfrac><mrow><msub><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mtext>A</mtext></msub><mo>-</mo><msub><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mtext>B</mtext></msub></mrow><msqrt><mrow><msubsup><mi>s</mi><mtext>pool</mtext><mn>2</mn></msubsup><mo>⋅</mo><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><msub><mi>n</mi><mtext>A</mtext></msub></mfrac><mo>+</mo><mfrac><mn>1</mn><msub><mi>n</mi><mtext>B</mtext></msub></mfrac></mrow><mo>)</mo></mrow></mrow></msqrt></mfrac></mstyle></mrow></math><span>,
 with <span><math><mrow><msubsup><mi>s</mi><mtext>pool</mtext><mn>2</mn></msubsup><mo>=</mo><mfrac><mrow><mrow><mrow><mo>(</mo><mrow><msub><mi>n</mi><mtext>A</mtext></msub><mo>-</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo>⋅</mo><msubsup><mi>s</mi><mtext>A</mtext><mn>2</mn></msubsup></mrow><mo>+</mo><mrow><mrow><mo>(</mo><mrow><msub><mi>n</mi><mtext>B</mtext></msub><mo>-</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo>⋅</mo><msubsup><mi>s</mi><mtext>B</mtext><mn>2</mn></msubsup></mrow></mrow><mrow><mrow><msub><mi>n</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>n</mi><mtext>B</mtext></msub></mrow><mo>-</mo><mn>2</mn></mrow></mfrac></mrow></math>
 denoting the pooled variance.</span></span></p>
 <p>The term is evaluated below. <code>print()</code> is needed because
 the return value of an assignment of the form
 <code>t &lt;- dfrac(...)</code> is not visible in R.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>m_A <span class="ot">&lt;-</span> <span class="fl">1.5</span>; s2_A <span class="ot">&lt;-</span> <span class="fl">2.4</span><span class="sc">^</span><span class="dv">2</span>; n_A <span class="ot">&lt;-</span> <span class="dv">27</span>; m_B <span class="ot">&lt;-</span> <span class="fl">3.9</span>; s2_B <span class="ot">&lt;-</span> <span class="fl">2.8</span><span class="sc">^</span><span class="dv">2</span>; n_B <span class="ot">&lt;-</span> <span class="dv">20</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">eval</span>(term))</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>m_A <span class="ot">&lt;-</span> <span class="fl">1.5</span>; s2_A <span class="ot">&lt;-</span> <span class="fl">2.4</span><span class="sc">^</span><span class="dv">2</span>; n_A <span class="ot">&lt;-</span> <span class="dv">27</span>; m_B <span class="ot">&lt;-</span> <span class="fl">3.9</span>; s2_B <span class="ot">&lt;-</span> <span class="fl">2.8</span><span class="sc">^</span><span class="dv">2</span>; n_B <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">eval</span>(term))</span></code></pre></div>
 <pre><code>## [1] -3.157427</code></pre>
 </div>
 <div id="context-dependent-rendering" class="section level2">
@@ -972,10 +958,10 @@ the return value of an assignment of the form
 <p>Consider an educational scenario in which we want to highlight a
 certain element of a term, for example, that a student has forgotten to
 subtract the null hypothesis in a <span class="math inline">\(t\)</span>-ratio:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dfrac</span>(<span class="fu">omit_right</span>(<span class="fu">mean</span>(D) <span class="sc">-</span> mu[0L]), s <span class="sc">/</span> <span class="fu">sqrt</span>(N)))</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;highlight&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dfrac</span>(<span class="fu">omit_right</span>(<span class="fu">mean</span>(D) <span class="sc">-</span> mu[0L]), s <span class="sc">/</span> <span class="fu">sqrt</span>(N)))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;highlight&quot;</span>))</span></code></pre></div>
 <p><math><mstyle displaystyle="true"><mfrac><mrow><mover accent="true"><mi>D</mi><mo>¯</mo></mover><mspace width="thinmathspace"></mspace><menclose notation="updiagonalstrike"><mrow><mo>-</mo><mspace width="thinmathspace"></mspace><msub><mi>μ</mi><mn>0</mn></msub></mrow></menclose></mrow><mrow><mi>s</mi><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></mfrac></mstyle></math></p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;fix&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;fix&quot;</span>))</span></code></pre></div>
 <p><math><mstyle displaystyle="true"><mfrac><mrow><mover accent="true"><mi>D</mi><mo>¯</mo></mover><mspace width="thinmathspace"></mspace><menclose notation="roundedbox"><mrow><mo>-</mo><mspace width="thinmathspace"></mspace><msub><mi>μ</mi><mn>0</mn></msub></mrow></menclose></mrow><mrow><mi>s</mi><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></mfrac></mstyle></math></p>
 <p>The R function <code>omit_right(a + b)</code> uses non-standard
 evaluation techniques <span class="citation">(e.g., Wickham 2019)</span>
@@ -1067,65 +1053,106 @@ the Appendix.</p>
 <h1>Conclusion</h1>
 <p>This package allows R to render its terms in pretty mathematical
 equations. It extends the current features of R and existing packages
-for displaying mathematical formulas in R <span class="citation">(Murrell and Ihaka 2000; Allaire et al. 2018)</span>),
-bit most importantly, <em>mathml</em> bridges the gap between
-computational needs, presentation of results, and their reproducibility.
-The package supports both MathML and Latex/MathJax for use in R Markdown
-documents, presentations and ShinyApp webpages.</p>
-<p>Researchers or teachers can already use RMarkdown to conduct analyses
-and show results, and <em>mathml</em> smoothes this process and allows
-for integrated calculations and output. As shown in the case study of
-the previous section, <em>mathml</em> can help to improve data analyses
-and statistical reports from an aesthetical perspective, as well as
-regarding reproducibility of research.</p>
+for displaying mathematical formulas in R <span class="citation">(Murrell and Ihaka 2000)</span>, but most importantly,
+bridges the gap between computational needs, presentation of results,
+and their reproducibility. The package supports both MathML and
+LaTeX/MathJax for use in R Markdown documents, presentations and Shiny
+App webpages.</p>
+<p>Researchers or teachers can already use R Markdown to conduct
+analyses and show results, and smoothes this process and allows for
+integrated calculations and output. As shown in the case study of the
+previous section, can help to improve data analyses and statistical
+reports from an aesthetical perspective, as well as regarding
+reproducibility of research.</p>
 <p>Furthermore, the package may also allow for a better detection of
 possible mistakes in R programs. Similar to most programming languages
 <span class="citation">(Green 1977)</span>, R code is notoriously hard
 to read, and the poor legibility of the language is one of the main
-sources of mistakes. For illustration, we consider a complicated
-equation <span class="citation">(e.g., Schwarz 1994)</span>.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu[<span class="st">&quot;A&quot;</span>]) <span class="sc">+</span> (<span class="fu">dfrac</span>(1L, mu[<span class="st">&quot;A&quot;</span>]) <span class="sc">-</span> <span class="fu">dfrac</span>(1L, mu[<span class="st">&quot;A&quot;</span>] <span class="sc">+</span> mu[<span class="st">&quot;B&quot;</span>]) <span class="sc">*</span> </span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    ((mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L<span class="sc">*</span>tau)))</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> (mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(2L<span class="sc">*</span>mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L))</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L<span class="sc">*</span>tau)))))</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(f1)</span></code></pre></div>
-<p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>+</mo><mrow><mo>{</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>-</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>μ</mi><mtext>B</mtext></msub></mrow></mfrac></mstyle><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><msub><mi>μ</mi><mtext>A</mtext></msub></mrow><mo>⁢</mo><mi>τ</mi></mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow><mo>}</mo></mrow></mrow></math></p>
+sources of mistakes. For illustration, we consider again Equation 10 in
+Schwarz <span class="citation">(1994)</span>.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(1L, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(1L, mu_A <span class="sc">+</span> mu_B) <span class="sc">*</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span>2L<span class="sc">*</span>tau)))</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(2L<span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span>2L))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span>2L<span class="sc">*</span>tau)))))</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(f1)</span></code></pre></div>
+<p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><mi>mu_A</mi></mfrac></mstyle><mo>+</mo><mrow><mo>{</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>mu_A</mi></mfrac></mstyle><mo>-</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><mi>mu_A</mi><mo>+</mo><mi>mu_B</mi></mrow></mfrac></mstyle><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msup><mi>sigma_A</mi><mn>2</mn></msup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><mi>mu_A</mi></mrow><mo>⁢</mo><mi>τ</mi></mrow><msup><mi>sigma_A</mi><mn>2</mn></msup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msup><mi>sigma_A</mi><mn>2</mn></msup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow><mo>}</mo></mrow></mrow></math></p>
 <p>The first version has a wrong parenthesis, which is barely visible in
 the code, whereas in the mathematical representation, the wrong curly
 brace is immediately obvious (the correct version is shown below for
 comparison).</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu[<span class="st">&quot;A&quot;</span>]) <span class="sc">+</span> (<span class="fu">dfrac</span>(1L, mu[<span class="st">&quot;A&quot;</span>]) <span class="sc">-</span> <span class="fu">dfrac</span>(1L, mu[<span class="st">&quot;A&quot;</span>] <span class="sc">+</span> mu[<span class="st">&quot;B&quot;</span>])) <span class="sc">*</span> </span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    ((mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L<span class="sc">*</span>tau)))</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> (mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(2L<span class="sc">*</span>mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L))</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu[<span class="st">&quot;A&quot;</span>]<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span>2L<span class="sc">*</span>tau))))</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(f2)</span></code></pre></div>
-<p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>+</mo><mrow><mrow><mo>(</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>-</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>μ</mi><mtext>B</mtext></msub></mrow></mfrac></mstyle></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><msub><mi>μ</mi><mtext>A</mtext></msub></mrow><mo>⁢</mo><mi>τ</mi></mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow></math></p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(1L, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(1L, mu_A <span class="sc">+</span> mu_B)) <span class="sc">*</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span>2L<span class="sc">*</span>tau)))</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(2L<span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span>2L))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span>2L<span class="sc">*</span>tau))))</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mathout</span>(f2)</span></code></pre></div>
+<p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><mi>mu_A</mi></mfrac></mstyle><mo>+</mo><mrow><mrow><mo>(</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>mu_A</mi></mfrac></mstyle><mo>-</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><mi>mu_A</mi><mo>+</mo><mi>mu_B</mi></mrow></mfrac></mstyle></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msup><mi>sigma_A</mi><mn>2</mn></msup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><mi>mu_A</mi></mrow><mo>⁢</mo><mi>τ</mi></mrow><msup><mi>sigma_A</mi><mn>2</mn></msup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><mi>mu_A</mi><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msup><mi>sigma_A</mi><mn>2</mn></msup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow></math></p>
 <p>As the reader may know from own experience, missed parentheses are
 frequent causes of wrong results and errors that are hard to locate in
 programming code. This particular example shows that mathematical
 rendering can help to substantially reduce the amount of careless errors
 in programming.</p>
-<p>In its current version <em>mathml</em> has some limitations. For
-example, it is currently not possible to use the functions of
-<em>mathml</em> for writing inline formulas, here, the user has to adopt
-the usual LateX notation. Moreover, for long equations, we did not yet
-find a convenient way to insert line breaks. This is mostly due to
-lacking support by MathML and LaTeX renderers. For example, in its
-current stage, the LaTeX package <em>breqn</em> <span class="citation">(Robertson et al. 2021)</span> is mostly a proof of
-concept.</p>
-<p>The package <em>mathml</em> is available for R version (…) and later,
-and can be easily installed using the usual
+<p>One limitation of the package is the lack of a convenient way to
+insert line breaks. This is mostly due to lacking support by MathML and
+LaTeX renderers. For example, in its current stage, the LaTeX package
+<code>breqn</code> <span class="citation">(Robertson et al. 2021)</span>
+is mostly a proof of concept. Moreover, is one-way road, that is, it is
+not possible to translate from LaTeX or HTML back to R <span class="citation">(see Capretto 2023, for an example)</span>.</p>
+<p>The package is available for R version 4.2 and later, and can be
+easily installed using the usual
 <code>install.packages(&quot;mathml&quot;)</code>. The source code of the package
 is found at <a href="https://github.com/mgondan/mathml" class="uri">https://github.com/mgondan/mathml</a>.</p>
 </div>
 <div id="appendix-customizing-the-package" class="section level1">
 <h1>Appendix: Customizing the package</h1>
+<div id="implementation-details" class="section level2">
+<h2>Implementation details</h2>
+<p>For convenience, the translation of R expressions to mathematical
+output is achieved through a Prolog interpreter from R package
+<em>rolog</em> <span class="citation">(Gondan 2022)</span>. Prolog is a
+classical logic programming language with many applications in expert
+systems, computer linguistics and symbolic artificial intelligence. The
+main strength of Prolog is its concise representation of facts and rules
+for knowledge and grammar, as well as its efficient built-in search
+engine for closed world domains. As it is well-known, R is a statistical
+programming language for data analysis and statistical modeling. Whereas
+Prolog is weak in statistical computation, but strong in symbolic
+manipulation, the converse may be said for the R language. The
+<em>rolog</em> package bridges this gap by providing an interface to a
+SWI-Prolog distribution <span class="citation">(Wielemaker et al.
+2012)</span> in R. The communication between the two systems is mainly
+in the form of queries from R  to Prolog, but two predicates allow
+Prolog to ring back and evaluate terms in R.</p>
+<p>The proper term for a Prolog “function” is predicate, and it is
+typically written with name and arity (i.e., number of arguments),
+separated by a forward slash. Thus, at the Prolog end, a predicate
+<code>math/2</code> translates the call <code>pbinom(K, N, Pi)</code>
+into a “function” <code>fn/2</code> with the name <code>P_Bi</code>, one
+argument <code>X =&lt; K</code>, and the two parameters <code>N</code>
+and <code>Pi</code>.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>math(pbinom(<span class="dt">K</span><span class="kw">,</span> <span class="dt">N</span><span class="kw">,</span> <span class="dt">Pi</span>)<span class="kw">,</span> <span class="dt">M</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a> =&gt; <span class="dt">M</span> <span class="kw">=</span> fn(subscript(<span class="st">&#39;</span><span class="er">P</span><span class="st">&#39;</span><span class="kw">,</span> <span class="ot">&quot;</span><span class="er">Bi</span><span class="ot">&quot;</span>)<span class="kw">,</span> ([<span class="st">&#39;</span><span class="er">X</span><span class="st">&#39;</span> <span class="dt">=&lt;</span> <span class="dt">K</span>] <span class="kw">;</span> [<span class="dt">N</span>, <span class="dt">Pi</span>]))<span class="kw">.</span></span></code></pre></div>
+<p><code>math/2</code> operates like a “macro” that translates one
+mathematical element (here, <code>pbinom(K, N, Pi)</code>) to a
+different mathematical element, namely
+<code>fn(Name, (Args ; Pars))</code>. The low-level predicate
+<code>ml/3</code> is used to convert these basic elements to MathML.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ml(<span class="dt">Flags</span><span class="kw">,</span> fn(<span class="dt">Name</span><span class="kw">,</span> (<span class="dt">Args</span> <span class="kw">;</span> <span class="dt">Pars</span>))<span class="kw">,</span> <span class="dt">M</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a> =&gt; ml(<span class="dt">Flags</span><span class="kw">,</span> <span class="dt">Name</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    ml(<span class="dt">Flags</span><span class="kw">,</span> paren(list(<span class="fu">op</span>(<span class="kw">;</span>)<span class="kw">,</span> [list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Args</span>), list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Pars</span>)]))<span class="kw">,</span> <span class="dt">X</span>)<span class="kw">,</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mrow([<span class="dt">N</span>, mo(&amp;(af)), <span class="dt">X</span>])<span class="kw">.</span></span></code></pre></div>
+<p>The relevant rule for <code>ml/3</code> builds the MathML entity
+<code>mrow([N, mo(&amp;(af)), X])</code>, with <code>N</code>
+representing the name of the function and <code>X</code> its arguments
+and parameters, enclosed in parentheses. A corresponding rule
+<code>jax/3</code> does the same for MathJax/LaTeX. A list of flags can
+be used for context-sensitive translation (see, e.g., the section on
+errors above).</p>
 <p>Several ways exist for translating new R terms to their mathematical
 representation. We have already seen above how to use “hooks” to
 translate long variable names from R to compact mathematical signs, as
@@ -1138,14 +1165,15 @@ translations according to a user’s needs. As stated in the background
 section, the Prolog end provides two classes of rules for translation,
 macros <code>math/2,3,4</code> mirroring the R hooks mentioned above,
 and the low-level predicates <code>ml/3</code> and <code>jax/3</code>
-that create proper MathML and Latex terms.</p>
+that create proper MathML and LateX terms.</p>
+</div>
 <div id="linear-models" class="section level2">
 <h2>Linear models</h2>
 <p>To render the model equation of a linear model such as
 <code>lm(EOT ~ T0 + Therapy, data=d)</code> in mathematical form, it is
 sufficient to map the <code>Formula</code> in
-<code>lm(Formula, Data)</code> to its respective equation. This can in
-two ways, using either the hooks described above, or a new
+<code>lm(Formula, Data)</code> to its respective equation <span class="citation">(see also Anderson, Heiss, and Sumners 2023)</span>.
+This can in two ways, using either the hooks described above, or a new
 <code>math/2</code> macro at the Prolog end.</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">lm</span>(.Formula, .Data), .Formula)</span></code></pre></div>
 <p>The hook is simple, but is a bit limited because only R’s tilde-form
@@ -1204,7 +1232,7 @@ then constructs the correct MathML entity
 <span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mroot([<span class="dt">X1</span>, <span class="dt">N1</span>])<span class="kw">.</span></span></code></pre></div>
 <p>The explicit unification <code>M = ...</code> in the last line serves
 to avoid clutter in the head of <code>mlx/3</code>. The Prolog file
-<code>nthroot.pl</code> also includes the respective rule for Latex and
+<code>nthroot.pl</code> also includes the respective rule for LateX and
 can be consulted from the package folder via the underlying package
 <em>rolog</em>.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;nthroot.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
@@ -1240,13 +1268,22 @@ in the numerator are not detected.</p>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-allaire2018" class="csl-entry">
-Allaire, JJ, Rich Iannone, Alison Presmanes Hill, and Yihui Xie. 2018.
-<span>“Distill for r Markdown.”</span> <a href="https://rstudio.github.io/distill/">https://rstudio.github.io/distill/</a>.
+<div id="ref-rmarkdown" class="csl-entry">
+Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
+Luraschi, Kevin Ushey, Aron Atkins, et al. 2023. <em>Rmarkdown: Dynamic
+Documents for r</em>. <a href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.
+</div>
+<div id="ref-equatiomatic" class="csl-entry">
+Anderson, Daniel, Andrew Heiss, and Jay Sumners. 2023. <em>Equatiomatic:
+Transform Models into ’LaTeX’ Equations</em>.
 </div>
 <div id="ref-pracma" class="csl-entry">
 Borchers, Hans W. 2022. <em>Pracma: Practical Numerical Math
 Functions</em>. <a href="https://CRAN.R-project.org/package=pracma">https://CRAN.R-project.org/package=pracma</a>.
+</div>
+<div id="ref-latex2r" class="csl-entry">
+Capretto, Tomas. 2023. <em>Latex2r: Translate Latex Formulas to r
+Code</em>. <a href="https://github.com/tomicapretto/latex2r">https://github.com/tomicapretto/latex2r</a>.
 </div>
 <div id="ref-Chang2022" class="csl-entry">
 Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
@@ -1300,6 +1337,10 @@ Logic Programming</em> 12 (1-2): 67–96.
 <div id="ref-Xie2020" class="csl-entry">
 Xie, Y., C. Dervieux, and E. Riederer. 2020. <em>R Markdown
 Cookbook</em>. Cambridge: Chapman and Hall/CRC.
+</div>
+<div id="ref-Xie2018" class="csl-entry">
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown:
+The Definitive Guide</em>. Boca Raton, Florida: Chapman and Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.
 </div>
 </div>
 </div>

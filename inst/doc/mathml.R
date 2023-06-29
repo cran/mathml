@@ -1,9 +1,6 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 library(mathml)
 
-mathout <- function(..., flags=NULL, env=parent.frame())
-  mathml(..., flags=c(flags, list(cat=TRUE)), env=env)
-
 ## -----------------------------------------------------------------------------
 term <- quote(pbinom(k, N, p))
 term
@@ -18,8 +15,8 @@ eval(term)
 library(mathml)
 mathjax(term)
 
-## ---- results='asis'----------------------------------------------------------
-mathout(term)
+## ---- results="asis", echo=FALSE----------------------------------------------
+math(term)
 
 ## ---- results='asis'----------------------------------------------------------
 term <- quote(1 + -2L + a + abc + "a" + phi + Phi + varphi + roof(b)[i, j]^2L)
@@ -282,20 +279,20 @@ knitr::kable(t, caption="Table 3. Highlighting elements of a term",
 
 ## ---- results="asis"----------------------------------------------------------
 f1 <- function(tau)
-{ dfrac(c, mu["A"]) + (dfrac(1L, mu["A"]) - dfrac(1L, mu["A"] + mu["B"]) * 
-    ((mu["A"]*tau - c) * pnorm(dfrac(c - mu["A"]*tau, sqrt(sigma["A"]^2L*tau)))
-      - (mu["A"]*tau + c) * exp(dfrac(2L*mu["A"]*tau, sigma["A"]^2L))
-        * pnorm(dfrac(-c - mu["A"]*tau, sqrt(sigma["A"]^2L*tau)))))
+{ dfrac(c, mu_A) + (dfrac(1L, mu_A) - dfrac(1L, mu_A + mu_B) * 
+    ((mu_A*tau - c) * pnorm(dfrac(c - mu_A*tau, sqrt(sigma_A^2L*tau)))
+      - (mu_A*tau + c) * exp(dfrac(2L*mu_A*tau, sigma_A^2L))
+        * pnorm(dfrac(-c - mu_A*tau, sqrt(sigma_A^2L*tau)))))
 }
 
 mathout(f1)
 
 ## ---- results="asis"----------------------------------------------------------
 f2 <- function(tau)
-{ dfrac(c, mu["A"]) + (dfrac(1L, mu["A"]) - dfrac(1L, mu["A"] + mu["B"])) * 
-    ((mu["A"]*tau - c) * pnorm(dfrac(c - mu["A"]*tau, sqrt(sigma["A"]^2L*tau)))
-      - (mu["A"]*tau + c) * exp(dfrac(2L*mu["A"]*tau, sigma["A"]^2L))
-        * pnorm(dfrac(-c - mu["A"]*tau, sqrt(sigma["A"]^2L*tau))))
+{ dfrac(c, mu_A) + (dfrac(1L, mu_A) - dfrac(1L, mu_A + mu_B)) * 
+    ((mu_A*tau - c) * pnorm(dfrac(c - mu_A*tau, sqrt(sigma_A^2L*tau)))
+      - (mu_A*tau + c) * exp(dfrac(2L*mu_A*tau, sigma_A^2L))
+        * pnorm(dfrac(-c - mu_A*tau, sqrt(sigma_A^2L*tau))))
 }
 
 mathout(f2)
