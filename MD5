@@ -1,12 +1,12 @@
-6b4a2c9404f6547627f9ae8225215bcf *DESCRIPTION
+3d0921fddae482cb8fb89f0dc29cee21 *DESCRIPTION
 12e6211c98c51c8ee6d4b596bc0006a5 *NAMESPACE
-0e3b467168c9ef3658fa238e7d1535ae *NEWS.md
-74a00d83098c9952fd07d799dcd32ea4 *R/mathml.R
+95ea12cd288bead8f3d3b1f364e7fbd2 *NEWS.md
+3bd6cbfbadcecfc9680a0ece365c482a *R/mathml.R
 8223aa99ebf1c42092d43fd466450440 *README.md
 c6a693b97f31ac3f0518414c9c91ef25 *build/vignette.rds
-7ffd594519ce00ebc14e58937e03b460 *inst/doc/mathml.R
-990c6a218bf4916b3b34b72d4a2a40de *inst/doc/mathml.Rmd
-4b2f7af239a38c3e1835268ca64d6e0a *inst/doc/mathml.html
+82bbb2c01fceb1e694e789c1a09dec08 *inst/doc/mathml.R
+87ecfb62b67ed8151b46963ae6a9ac22 *inst/doc/mathml.Rmd
+df32f31d135ac7dc99e65a273763d852 *inst/doc/mathml.html
 8f6e3bfe6467ff8e824a8e7b5bda1bc3 *inst/pl/lm.pl
 63cac16f29c1bc1a9bdf7e40c815ad1c *inst/pl/mathml.pl
 65083aed90f3a983bfd2eb75d55eeded *inst/pl/nthroot.pl
@@ -54,5 +54,5 @@ dba5b5d3e5593fb5d107456292fd30da *man/over.Rd
 15df548d28183050465ff7eddda975dd *man/sum_over.Rd
 468d5c76bc1f80a419a7d8c499851c6c *tests/testthat.R
 64878a2cfe46f97ca84f786dca1df1a8 *tests/testthat/test-mathml.R
-34576f40ed6d4f41e5a7b056a7a305ea *vignettes/bibliography.bibtex
-990c6a218bf4916b3b34b72d4a2a40de *vignettes/mathml.Rmd
+392d1a03c8fb7022ead64770606e138c *vignettes/bibliography.bibtex
+87ecfb62b67ed8151b46963ae6a9ac22 *vignettes/mathml.Rmd

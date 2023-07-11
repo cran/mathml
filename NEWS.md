@@ -1,3 +1,8 @@
+# mathml 1.1
+
+* Revised manuscript
+* math() does not require "asis" in code chunks
+
 # mathml 1.0
 
 * Maintainance release
@@ -5,7 +10,7 @@
 
 # mathml 0.8
 
-* Maintainan release
+* Maintainance release
 * Prepare manuscript submission
 
 # mathml 0.7

@@ -1,8 +1,8 @@
 Package: mathml
 Type: Package
 Title: Translate R Expressions to 'MathML' and 'LaTeX'/'MathJax'
-Version: 1.0
-Date: 2023-06-27
+Version: 1.1
+Date: 2023-08-27
 Authors@R: c(person("Matthias", "Gondan", role=c("aut", "cre", "cph"),
   email="Matthias.Gondan-Rochon@uibk.ac.at", comment="Universität Innsbruck"),
   person("Irene", "Alfarone", role="aut",
@@ -26,10 +26,10 @@ VignetteBuilder: knitr, rmarkdown
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-06-29 20:27:02 UTC; matthias
+Packaged: 2023-07-11 05:24:43 UTC; matthias
 Author: Matthias Gondan [aut, cre, cph] (Universität Innsbruck),
   Irene Alfarone [aut] (Universität Innsbruck),
   European Commission [fnd] (Erasmus+ Programme,
     2019-1-EE01-KA203-051708)
 Repository: CRAN
-Date/Publication: 2023-06-29 20:50:02 UTC
+Date/Publication: 2023-07-11 12:00:12 UTC

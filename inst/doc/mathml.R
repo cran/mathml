@@ -15,40 +15,40 @@ eval(term)
 library(mathml)
 mathjax(term)
 
-## ---- results="asis", echo=FALSE----------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(1 + -2L + a + abc + "a" + phi + Phi + varphi + roof(b)[i, j]^2L)
-mathout(term)
+math(term)
 
 term <- quote(round(3.1415, 3L) + NaN + NA + TRUE + FALSE + Inf + (-Inf))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(bold(b[x, 5L]) + bold(b[italic(x)]) + italic(ab) + italic(42L))
-mathout(term)
+math(term)
 
 term <- quote(tilde(a) + mean(X) + boxed(c) + cancel(d) + phantom(e) + prime(f))
-mathout(term)
+math(term)
 
-## ---- results="asis"----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(a - ((b + c)) - d*e + f*(g + h) + i/j + k^(l + m) + (n*o)^{p + q})
-mathout(term)
+math(term)
 
 term <- quote(dot(a, b) + frac(1L, nodot(c, d + e)) + dfrac(1L, times(g, h)))
-mathout(term)
+math(term)
 
 ## -----------------------------------------------------------------------------
 term <- quote(a^(b + c))
 paste(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(mean(X) %+-% 1.96 * s / sqrt(N))
-mathout(term)
+math(term)
 term <- quote('%+-%'(mean(X), 1.96 * s / sqrt(N))) # functional form of '%+-%'
 term <- quote(mean(X) %+-% {1.96 * s / sqrt(N)})   # the same
-mathout(term)
+math(term)
 
 ## ----custom-operators, echo=FALSE---------------------------------------------
 op1 <- list(
@@ -121,11 +121,11 @@ t <- cbind(Operator=op1, Output=m1,
 knitr::kable(t, caption="Table 1. Custom operators in mathml",
   row.names=FALSE, escape=FALSE)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(sin(x) + sin(x)^2L + cos(pi/2L) + tan(2L*pi) * expm1(x))
-mathout(term)
+math(term)
 term <- quote(choose(N, k) + abs(x) + sqrt(x) + floor(x) + exp(frac(x, y)))
-mathout(term)
+math(term)
 
 ## ----base-stats, echo=FALSE---------------------------------------------------
 op1 <- list(
@@ -182,7 +182,7 @@ t <- cbind(Function=op1, Output=m1, Function=op2, Output=m2)
 knitr::kable(t, caption="Table 2. R functions from _base_ and _stats_",
   row.names=FALSE, escape=FALSE)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 sgn <- function(x)
 {
   if(x == 0L) return(0L)
@@ -190,49 +190,49 @@ sgn <- function(x)
   if(x > 0L) return(1L)
 }
 
-mathout(sgn)
-mathout(call("<-", quote(sgn(x)), sgn))
+math(sgn)
+math(call("<-", quote(sgn(x)), sgn))
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(S[Y]^2L <- frac(1L, N) * sum(Y[i] - mean(Y))^2L)
-mathout(term)
+math(term)
 
 term <- quote(log(prod_over(L[i], i==1L, N)) <- sum_over(log(L[i]), i==1L, N))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 term <- quote(integrate(sin, 0L, 2L*pi))
-mathout(term)
+math(term)
 eval(term)
 
 ## -----------------------------------------------------------------------------
 term <- quote(integrate(lower=0L, upper=2L*pi, sin))
 canonical(term)
 
-## ---- results='asis'----------------------------------------------------------
-mathout(canonical(term))
+## -----------------------------------------------------------------------------
+math(canonical(term))
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 v <- 1:3
-mathout(call("t", v))
+math(call("t", v))
 
 A <- matrix(data=11:16, nrow=2, ncol=3)
 B <- matrix(data=21:26, nrow=2, ncol=3)
 term <- call("+", A, B)
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 hook(successes, k)
 hook(quote(Ntotal), quote(N), quote=FALSE)
 hook(prob, pi)
 term <- quote(dbinom(successes, Ntotal, prob))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 hook(pbinom(.K, .N, .P), sum_over(dbinom(i, .N, .P), i=0L, .K))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 hook(m_A, mean(X)["A"]) ; hook(s2_A, s["A"]^2L) ;
 hook(n_A, n["A"])
 hook(m_B, mean(X)["B"]) ; hook(s2_B, s["B"]^2L)
@@ -240,16 +240,16 @@ hook(n_B, n["B"]) ; hook(s2_p, s["pool"]^2L)
 term <- quote(t <- dfrac(m_A - m_B, 
     sqrt(denote(s2_p, frac((n_A - 1L)*s2_A + (n_B - 1L)*s2_B, n_A + n_B - 2L),
                 "the pooled variance.") * (frac(1L, n_A) + frac(1L, n_B)))))
-mathout(term)
+math(term)
 
 ## -----------------------------------------------------------------------------
 m_A <- 1.5; s2_A <- 2.4^2; n_A <- 27; m_B <- 3.9; s2_B <- 2.8^2; n_B <- 20
 print(eval(term))
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 t <- quote(dfrac(omit_right(mean(D) - mu[0L]), s / sqrt(N)))
-mathout(t, flags=list(error="highlight"))
-mathout(t, flags=list(error="fix"))
+math(t, flags=list(error="highlight"))
+math(t, flags=list(error="fix"))
 
 ## ----mistakes, echo=FALSE-----------------------------------------------------
 op1 <- list(
@@ -277,7 +277,12 @@ t <- cbind(Operation=op1,
 knitr::kable(t, caption="Table 3. Highlighting elements of a term",
   row.names=FALSE, escape=FALSE)
 
-## ---- results="asis"----------------------------------------------------------
+## -----------------------------------------------------------------------------
+hook(mu_A, mu["A"])
+hook(mu_B, mu["B"])
+hook(sigma_A, sigma["A"])
+hook(sigma_B, sigma["B"])
+
 f1 <- function(tau)
 { dfrac(c, mu_A) + (dfrac(1L, mu_A) - dfrac(1L, mu_A + mu_B) * 
     ((mu_A*tau - c) * pnorm(dfrac(c - mu_A*tau, sqrt(sigma_A^2L*tau)))
@@ -285,9 +290,9 @@ f1 <- function(tau)
         * pnorm(dfrac(-c - mu_A*tau, sqrt(sigma_A^2L*tau)))))
 }
 
-mathout(f1)
+math(f1)
 
-## ---- results="asis"----------------------------------------------------------
+## -----------------------------------------------------------------------------
 f2 <- function(tau)
 { dfrac(c, mu_A) + (dfrac(1L, mu_A) - dfrac(1L, mu_A + mu_B)) * 
     ((mu_A*tau - c) * pnorm(dfrac(c - mu_A*tau, sqrt(sigma_A^2L*tau)))
@@ -295,26 +300,26 @@ f2 <- function(tau)
         * pnorm(dfrac(-c - mu_A*tau, sqrt(sigma_A^2L*tau))))
 }
 
-mathout(f2)
+math(f2)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 rolog::consult(system.file(file.path("pl", "lm.pl"), package="mathml"))
 
 term <- quote(lm(EOT ~ T0 + Therapy, data=d, na.action=na.fail))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 nthroot <- function(x, n)
   x^{1L/n}
 
 term <- canonical(quote(nthroot(n=3L, 2L)))
-mathout(term)
+math(term)
 
-## ---- results='asis'----------------------------------------------------------
+## -----------------------------------------------------------------------------
 rolog::consult(system.file(file.path("pl", "nthroot.pl"), package="mathml"))
 
 term <- quote(nthroot(a * (b + c), 3L)^2L)
-mathout(term)
+math(term)
 term <- quote(a^(1L/3L) + a^{1L/3L} + a^(1.0/3L))
-mathout(term)
+math(term)
 
