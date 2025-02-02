@@ -23,7 +23,9 @@
 #' MathML string.
 #'
 #' @param flags (default NULL)
-#' list of flags that control the translation
+#' list of flags that control the translation. This includes "context" settings
+#' such as error("ignore"), or a default number of decimal places for numeric
+#' output.
 #'
 #' @param env (default globalenv())
 #' The R environment in which r_eval is being executed.
@@ -41,6 +43,8 @@
 #'
 #' @examples
 #' mathml(term=quote((a + b)^2L == a^2L + 2L*a*b + b^2L))
+#' mathml(term=3.14159265, flags=list(round=3L))
+#' mathml(term=3.14159265, flags=list(quote(round(3L))))
 #'
 mathml <- function(term=quote((a + b)^2L == a^2L + 2L*a*b + b^2L), flags=NULL,
   env=globalenv())
@@ -355,6 +359,9 @@ canonical <- function(term=quote(`%in%`(table=Table, x=X)), drop=TRUE)
 }
 
 #' Hook for custom symbols
+#' 
+#' hook(term, display)
+#' unhook(term)
 #'
 #' @param term
 #' an R call or symbol/number. This is the expression to replace.
@@ -366,7 +373,7 @@ canonical <- function(term=quote(`%in%`(table=Table, x=X)), drop=TRUE)
 #' indicates that _term_ and _display_ should be quoted.
 #'
 #' @param as.rolog (default is TRUE)
-#' indicates that simplified quasi-quotoation is to be used.
+#' indicates that simplified quasi-quotation is to be used.
 #'
 #' @return
 #' TRUE on success
@@ -376,8 +383,9 @@ canonical <- function(term=quote(`%in%`(table=Table, x=X)), drop=TRUE)
 #' @examples
 #' hook(t0, subscript(t, 0))
 #' mathml(quote(t0))
-#'
-#' hook(term=quote(t0), display=quote(subscript(t, 0)), quote=FALSE)
+#' hook(term=quote(t0), display=quote(superscript(t, 0)), quote=FALSE)
+#' mathml(quote(t0))
+#' unhook(t0)
 #' mathml(quote(t0))
 #'
 hook <- function(term, display, quote=TRUE, as.rolog=TRUE)
@@ -394,10 +402,27 @@ hook <- function(term, display, quote=TRUE, as.rolog=TRUE)
     display <- rolog::as.rolog(display)
   }
 
-  r <- rolog::once(call("assert", call("math_hook", term, display)))
+  r <- rolog::once(call("asserta", call("math_hook", term, display)))
   if(isFALSE(r))
     return(FALSE)
 
+  invisible(r)
+}
+
+#' @rdname hook
+#' @export
+unhook <- function(term, quote=TRUE, as.rolog=TRUE)
+{
+  if(quote)
+    term <- substitute(term)
+
+  if(as.rolog)
+    term <- rolog::as.rolog(term)
+
+  r <- rolog::once(call("retractall", call("math_hook", term, expression(X))))
+  if(isFALSE(r))
+    return(FALSE)
+  
   invisible(r)
 }
 
@@ -439,18 +464,6 @@ times <- dot
 frac <- function(e1, e2)
   e1 / e2
 
-#' Division displayed as fraction
-#'
-#' @param e1
-#' numerator
-#'
-#' @param e2
-#' denominator
-#'
-#' @return
-#' e1 / e2
-#'
-over <- frac
 
 #' Division displayed as large fraction
 #'
@@ -914,3 +927,23 @@ prime <- identity
 #' @rdname decorations
 #' @export
 tilde <- identity
+
+#' @rdname decorations
+#' @export
+over <- identity
+
+#' @rdname decorations
+#' @export
+under <- identity
+
+#' @rdname decorations
+#' @export
+underover <- identity
+
+#' @rdname decorations
+#' @export
+hyph<- identity
+
+#' @rdname decorations
+#' @export
+color<- identity

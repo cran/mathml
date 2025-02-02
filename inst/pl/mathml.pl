@@ -11,8 +11,8 @@
 % From R, the hook is installed by
 % mathml::hook(t0, subscript(t, 0))
 %
-:- dynamic math_hook/2.
-:- multifile math_hook/2.
+:- dynamic math_hook/2, math_hook/3, math_hook/4.
+:- multifile math_hook/2, math_hook/3, math_hook/4.
 
 % Low-level functions (see, e.g. nthroot.pl)
 %
@@ -66,10 +66,20 @@ mathjax(R, M, Flags)
 % Translates the R expression to another R expression M, checking for Flags
 % and eventually changing Flags to Flags1
 %
-macro(R, M, Flags, Flags1) :-
-    math_hook(R, M0),            % math hook from R
+macro(A, A1, Flags, Flags1) :-
+    math_hook(A, A0, Flags, Flags0),
+    !, Flags1 = Flags0,
+    A1 = A0.
+
+macro(A, A1, Flags, Flags1) :-
+    math_hook(A, A0, Flags),
     !, Flags1 = Flags,
-    M = M0.
+    A1 = A0.
+
+macro(A, A1, Flags, Flags1) :-
+    math_hook(A, A0),
+    !, Flags1 = Flags,
+    A1 = A0.
 
 macro(R, M, Flags, Flags1) :-
     math(R, M, Flags, Flags1),   % math/4 macro changing Flags
@@ -268,6 +278,35 @@ mathml :-
 mathml :-
     mathml('['(x, i, 2)).
 
+% Under
+
+%
+% Check for under(over(A, Power), Index)
+%
+math(under(A, Idx), X, Flags, New),
+    type(A, over(Bas, Pwr), Flags)
+ => New = [replace(over(Bas, Pwr), underover(Bas, Idx, Pwr)) | Flags],
+    X = A. 
+
+ml(under(A, B), M, Flags)
+ => ml(A, X, Flags),
+    ml(B, Y, Flags),
+    M = munder([X, Y]).
+
+paren(under(A, _), Paren, Flags)
+ => paren(A, Paren, Flags).
+
+prec(under(A, _), Prec,Flags)
+ => prec(A, Prec, Flags).
+
+type(under(A, B), Type, _Flags)
+ => Type = under(A, B).
+
+jax(under(A, B), M, Flags)
+ => jax(A, X, Flags),
+    jax(B, Y, Flags),
+    format(string(M), "{~w}/limits_{~w}", [X, Y]).
+
 % Superscripts like s^2
 %
 % See above for terms that have an index and a power at the same time.
@@ -315,6 +354,35 @@ mathml :-
 mathml :-
     mathml(-1 ^ 2).
 
+% Over
+
+%
+% Check for over(under(A, Index), Power)
+%
+math(over(A, Pwr), X, Flags, New),
+    type(A, under(Bas, Idx), Flags)
+ => New = [replace(under(Bas, Idx), underover(Bas, Idx, Pwr)) | Flags],
+    X = A. 
+
+ml(over(A, B), M, Flags)
+ => ml(A, X, Flags),
+    ml(B, Y, Flags),
+    M = mover([X, Y]).
+
+paren(over(A, _), Paren, Flags)
+ => paren(A, Paren, Flags).
+
+prec(over(_, _), Prec, _Flags)
+ => current(Prec, xfy, ^).
+
+type(over(A, B), Type, _Flags)
+ => Type = over(A, B).
+
+jax(over(A, B), M, Flags)
+ => jax(A, X, Flags),
+    jax(B, Y, Flags),
+    format(string(M), "{~w}/limits^{~w}", [X, Y]).
+
 % Subscripts and superscripts
 %
 math(subsupscript(Base, Idx, Pwr), M, Flags),
@@ -352,6 +420,72 @@ mathml :-
 
 mathml :-
     mathml('['(x, i)^2).
+
+% Underover
+ml(underover(A, B, C), M, Flags)
+ => ml(A, X, Flags),
+    ml(B, Y, Flags),
+    ml(C, Z, Flags),
+    M = munderover([X, Y, Z]).
+
+paren(underover(A, _, _), Paren, Flags)
+ => paren(A, Paren, Flags).
+
+prec(underover(A, _, C), Prec, Flags)
+ => prec(over(A, C), Prec, Flags).
+
+type(underover(A, B, C), Type, _Flags)
+ => Type = underover(A, B, C).
+
+math(under(A, Idx), X, Flags, New),
+    type(A, over(Bas, Pwr, Flags), Flags)
+ => New = [replace(over(Bas, Pwr), underover(Bas, Idx, Pwr)) | Flags],
+    X = A. 
+
+jax(underover(A, B, C), M, Flags)
+ => jax(A, X, Flags),
+    jax(B, Y, Flags),
+    jax(C, Z, Flags),
+    format(string(M), "{~w}/limits_{~w}^{~w}", [X, Y, Z]).
+
+%
+% Hyphen
+%
+math(hyph(L, R), M, _Flags)
+ =>  M = hyph(L, R).
+
+ml(hyph(L, R), M, Flags)
+ => ml(L, X, Flags),
+    ml(R, Y, Flags),
+    M = mtext([X, &('#8209'), Y]). 
+
+jax(hyph(L, R), M, Flags)
+ => jax(L, X, Flags),
+    jax(R, Y, Flags),
+    format(string(M), "\\mbox{{~w}{-}{~w}}", [X, Y]). 
+
+%
+% Colours 
+%
+math(color(C, A), M, _Flags)
+ => M = color(C, A).
+
+ml(color(C, A), M, Flags),
+    atom(C)
+ => member(color(C, S), Flags),
+    ml(color(S, A), M, Flags).
+
+ml(color(C, A), M, Flags),
+    string(C)
+ => ml(A, X, Flags),
+    M = mstyle(mathcolor(C), X).
+
+jax(color(C, A), M, Flags)
+ => jax(A, X, Flags),
+    format(string(M), "\\color{~w}{~w}", [C, X]). 
+
+type(color(_C, A), T, Flags)
+ => type(A, T, Flags).
 
 % Strings are translated to upright text
 math(R, M),
@@ -849,8 +983,12 @@ math(or(A, B), M)
     M = xfy(Prec, or, A, B).
 
 math(!(A), M)
- => current(Prec, xfy, ^),
+ => current(Prec, xfy, ','),
     M = fy(Prec, not, A).
+
+math(!(A, B), M)
+ => current(Prec, xfy, ^),
+    M = xfy(Prec, not, A, B).
 
 math(xor(x=A, y=B), M)
  => M = xor(A, B).
@@ -951,6 +1089,57 @@ math(Hash, M, _Flags),
     member(Name, ['##', '$$', '%%', '!!'])
  => M = paren(Elements).
 
+% Prooftree: two tables are needed because of different attributes
+
+% For the table with two rows
+ml(proof_tree(A), M, Flags),
+    compound(A),
+    compound_name_arguments(A, Name, Rows),
+    member(Name, ['###2'])
+ => maplist(ml_row(Flags), Rows, R),
+    M = mrow([mtable([align('top 2'), rowlines(solid), framespacing('0 0'), semantics('bspr_inferenceRule:down')], R)]).
+
+% For the table with just one row
+ml(A, M, Flags),
+    compound(A),
+    compound_name_arguments(A, Name, Rows),
+    member(Name, ['###1'])
+ => maplist(ml_row2(Flags), Rows, R),
+    M = mrow([mtable([framespacing('0 0')], R)]).
+
+% Needed to set the attribute of the cell to "rowalign('bottom')"
+ml_row2(Flags, Row, M),
+    compound(Row),
+    compound_name_arguments(Row, Name, Cells),
+    member(Name, ['##', '$$', '%%', '!!'])
+ => maplist(ml_cell2(Flags), Cells, C),
+    M = mtr(C).
+
+ml_cell2(Flags, Cell, M)
+ => ml(Cell, C, Flags),
+    ml(mrow_attribute([semantics('bspr_inference:1;bspr_labelledRule:right')], C), C1, Flags),
+    M = mtd([rowalign('bottom')], C1).
+
+ml(mrow_attribute(Attr, A), M, _Flags)
+ => M = mrow(Attr, [A]).
+
+% Needed to add attributes
+ml_cell3(Flags, Cell, M)
+ => ml(func3(Cell), C, Flags),
+    M = mtd(C).
+
+ml(func3(A), M, Flags) 
+ => ml(A, M1, Flags),
+    %ml(mrow_attribute([data-mjx-textclass('ORD')], M1), M2, Flags),
+    M = mrow(mspace([width('.5ex')], mstyle([displaystyle('false'), scriptlevel('0')], M1))).
+
+/* This should be:
+ M = mrow(mspace([width('.5ex')]), mstyle([displaystyle('false'), scriptlevel('0')], M1)).
+
+so that the resulting line is <mrow><mspace width(".5ex")</mspace> ...</mrow>
+but it raises an error
+*/
+    
 % Matrices
 ml(Matrix, M, Flags),
     compound(Matrix),
@@ -964,6 +1153,14 @@ ml_row(Flags, Row, M),
     compound_name_arguments(Row, Name, Cells),
     member(Name, ['##', '$$', '%%', '!!'])
  => maplist(ml_cell(Flags), Cells, C),
+    M = mtr(C).
+
+% Needed to add attributes with "ml_cell3 (see above)"
+ml_row(Flags, Row, M),
+    compound(Row),
+    compound_name_arguments(Row, Name, Cells),
+    member(Name, ['##1'])
+ => maplist(ml_cell3(Flags), Cells, C),
     M = mtr(C).
 
 ml_cell(Flags, Cell, M)
@@ -1447,6 +1644,15 @@ ml(op('%prop%'), M, _Flags)
 jax(op('%prop%'), M, _Flags)
  => M = "\\propto".
 
+ml(op('%>%'), M, _Flags)
+ => M = mo(&('#x22A2')).
+
+ml(op('%<%'), M, _Flags)
+ => M = mo(&('#x22AC')).
+
+ml(op('%,%'), M, _Flags)
+ => M = mo(',').
+
 ml(op(and), M, _Flags)
  => M = mo(&(and)).
 
@@ -1454,6 +1660,9 @@ jax(op(and), M, _Flags)
  => M = "\\land".
 
 ml(op(or), M, _Flags)
+ => M = mo(&(or)).
+
+ml(op('%|%'), M, _Flags)
  => M = mo(&(or)).
 
 jax(op(or), M, _Flags)
@@ -1464,6 +1673,9 @@ ml(op(not), M, _Flags)
 
 jax(op(not), M, _Flags)
  => M = "\\lnot".
+
+ml(op(~), M, _Flags)
+ => M = mo(&(not)).
 
 ml(op(veebar), M, _Flags)
  => M = mo(&(veebar)).
@@ -1546,13 +1758,21 @@ ml(posint(A), M, _Flags)
 ml(pos(1.0Inf), M, _Flags)
  => M = mi(&('#x221E')).
 
-% Default number of decimals is 2, change it using Flags
+% Default number of decimals is getOption("digits") from R
 math(round(A, D), M, Flags0, Flags1)
  => M = A,
-    Flags1 = [round(D) | Flags0].
+    Flags1 = [digits(D) | Flags0].
+
+digits(Flags, D),
+    r_eval(getOption("digits"), Default),
+    integer(Default)
+ => option_(digits(D), Flags, Default).
+
+digits(Flags, D)
+ => option_(digits(D), Flags, 2).
 
 ml(pos(A), M, Flags)
- => option(round(D), Flags, 2),
+ => digits(Flags, D),
     format(atom(Mask), '~~~wf', [D]),
     format(string(X), Mask, [A]),
     M = mn(X).
@@ -1564,15 +1784,15 @@ jax(pos(1.0Inf), M, _Flags)
  => M = "\\infty".
 
 jax(pos(A), M, Flags)
- => option(round(D), Flags, 2),
+ => digits(Flags, D),
     format(atom(Mask), '~~~wf', [D]),
     format(string(M), Mask, [A]).
 
-type(pos(_), Type, _Flags)
- => Type = [atomic].
+type(pos(A), Type, _Flags)
+ => Type = [numeric(A), atomic].
 
-type(posint(_), Type, _Flags)
- => Type = [atomic].
+type(posint(A), Type, _Flags)
+ => Type = [numeric(A), atomic].
 
 math(number(A), M),
     A < 0
@@ -1682,6 +1902,34 @@ math('%prop%'(A, B), X)
  => current_op(Prec, xfx, =),
     X = yfy(Prec, '%prop%', A, B).
 
+math('%>%'(A), X)
+ => current_op(Prec, xfy, ';'),
+    X = fy(Prec, '%>%', A).
+
+math('%>%'(A, B), X)
+ => current_op(Prec, xfy, ';'),
+    X = yfy(Prec, '%>%', A, B).
+
+math('%<%'(A), X)
+ => current_op(Prec, xfy, ','),
+    X = fy(Prec, '%<%', A).
+
+math('%<%'(A, B), X)
+ => current_op(Prec, xfy, ','),
+    X = yfy(Prec, '%<%', A, B).
+
+math('%,%'(A, B), X)
+ => current_op(Prec, xfy, ','),
+    X = yfy(Prec, '%,%', A, B).
+
+math('%|%'(A, B), X)
+ => current_op(Prec, xfy, ';'),
+    X = yfy(Prec, '%|%', A, B).
+
+math(~(A), X)
+ => current_op(Prec, fy, \+),
+    X = fy(Prec, ~, A).
+
 math(A > B, X)
  => current_op(Prec, xfx, >),
     X = yfy(Prec, >, A, B).
@@ -1769,8 +2017,8 @@ math(A / B, X)
     X = yfx(Prec, /, A, B).
 
 math((A ; B), X)
- => current_op(Prec, xfy, ;),
-    X = xfy(Prec, ;, A, B).
+ => current_op(Prec, xfx, =),
+    X = yfy(Prec, ;, A, B).
 
 math(A^B, X)
  => X = superscript(A, B).
@@ -2215,9 +2463,6 @@ type(frac(_, _), Type, _Flags)
 math(dfrac(Num, Den), M)
  => M = display(frac(Num, Den)).
 
-math(over(Num, Den), M)
- => M = frac(Num, Den).
-
 % Integer division
 math(div(Num, Den), M)
  => M = floor(Num / Den).
@@ -2274,6 +2519,15 @@ option_(NameOption, Flags) :-
     compound_name_arguments(NameOption, Name, [Option]),
     member(Name-String, Flags),
     atom_string(Option, String).
+
+option_(NameOption, Flags, _Default),
+    compound_name_arguments(NameOption, Name, [_]),
+    compound_name_arguments(NameOption0, Name, [_]),
+    option_(NameOption0, Flags)
+ => NameOption = NameOption0.
+ 
+option_(NameOption, _Flags, Default)
+ => compound_name_arguments(NameOption, _Name, [Default]).
 
 math(omit_left(Expr), M, Flags),
     option_(error(ignore), Flags)

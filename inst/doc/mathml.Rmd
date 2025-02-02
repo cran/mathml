@@ -2,7 +2,7 @@
 title: "mathml: Translate R expressions to MathML and LaTeX"
 author: "Matthias Gondan and Irene Alfarone
          (Universität Innsbruck, Department of Psychology)"
-date: "2023-07-12"
+date: "2024-01-30"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bibtex
 preamble:
@@ -20,23 +20,23 @@ library(mathml)
 
 The R\ extension of the markdown language [@Xie2018;@rmarkdown] enables
 reproducible statistical reports with nice typesetting in HTML, Microsoft Word,
-and LaTeX. Moreover, since recently [@R, version 4.2], R\'s manual pages 
+and LaTeX. Moreover, since recently [@R, version 4.3], R\'s manual pages 
 include support for mathematical expressions [@Sarkar2022;@Viechtbauer2022],
-which already is a big improvement. However, except for special cases 
+which is already a big improvement. However, except for special cases 
 such as regression models [@equatiomatic] and R's own plotmath annotation, 
 rules for the mapping of built-in language elements to their mathematical 
 representation are still lacking. So far, R\ expressions such 
 as `pbinom(k, N, p)` are printed as they are and pretty mathematical formulae 
 such as \(P_{\mathrm{Bi}}(X \le k; N, p)\) require explicit LaTeX commands
 like `P_{\mathrm{Bi}}\left(X \le k; N, p\right)`. Except for very basic use
-cases, these commands are tedious to type in and their source code is hard to
+cases, these commands are tedious to type and their source code is hard to
 read.
 
 The present R\ package defines a set of rules for the automatic translation of
 R\ expressions to mathematical output in R\ Markdown documents [@Xie2020] and
 Shiny Apps [@Chang2022]. The translation is done by an embedded Prolog
 interpreter that maps nested expressions recursively to MathML and
-LaTeX/MathJax, respectively. User-defined hooks enable to extend the set of
+LaTeX/MathJax, respectively. User-defined hooks enable extension of the set of
 rules, for example, to represent specific R\ elements by custom mathematical
 signs.
 
@@ -53,7 +53,7 @@ R\ functions (e.g., `quote()`, `call()` etc.) that allow the user to create R\ c
 which can be stored in regular variables and then, for example, evaluated at
 a later stage or in a specific environment [@Wickham2019]. The present package
 includes a set of rules that translate such calls to a mathematical
-representation in MathML and LaTeX. For a first illustration of the _mathml_ 
+representation in MathML and LaTeX. For a first illustration of the _mathml_
 package, we consider the binomial probability.
 
 ```{r}
@@ -69,7 +69,7 @@ readers will remember that the quoted expression above is a short form for
 term <- call("pbinom", as.name("k"), as.name("N"), as.name("p"))
 ```
 
-As it can be seen from the output, to the variable `term` is not assigned the 
+As can be seen from the output, to the variable `term` is not assigned the 
 result of the calculation, yet an R\ call [see, e.g., @Wickham2019, for details 
 on "non-standard evaluation"], which can eventually be evaluated with `eval()`,
 
@@ -95,8 +95,8 @@ necessary in edge cases. The package also includes a function `mathout()` that
 wraps a call to `mathml()` for HTML output and `mathjax()` for LaTeX output.
 Moreover, the function `math(x)` adds the class `"math"` to its argument, such
 that a special knitr printing function is
-invoked [see the vignette on custom print methods in @knitr].
-
+invoked [see the vignette on custom print methods in @knitr]. An R\ Markdown
+code chunk with `mathout(term)` thus produces:
 
 ````{r, echo=FALSE}
 math(term)
@@ -127,9 +127,12 @@ math(term)
 ```
 
 An expression such as `1 + -2` may be considered unsatisfactory from an
-aesthetical perspective. It is correct R\ syntax, though, and is reproduced
+aesthetic perspective. It is correct R\ syntax, though, and is reproduced
 accordingly, without the parentheses. Parentheses around negated numbers or
-symbols can be added as shown above for `+ (-Inf)`.
+symbols can be added as shown above for `+ (-Inf)`. If `round` is not given,
+R's default number of decimals from `getOption("digits")` is used (which is way
+too large in the author's opinion---in line with the unfortunate practice of
+statistics programs).
 
 To avoid name clashes with package _stats_, `roof()` is used instead of `hat()`
 to put a hat on a symbol (see next section for further decorations). Note that
@@ -138,7 +141,7 @@ for convenience and points to the identity function.
 
 ## Decorations
 
-The package offers some support for different fonts as well as accents and
+The package offers some support for different fonts and colors as well as accents and
 boxes etc. Internally, these decorations are implemented as identity functions,
 so they can be introduced into R expressions without side-effects.
 
@@ -152,6 +155,16 @@ math(term)
 
 Note that the font styles only affect the display of identifiers, whereas
 numbers, character strings etc. are left untouched.
+
+Colors can be specified as color names, RGB-values (in decimal or hexadecimal format), 
+HSL-values and HWB-values.
+
+```{r}
+term <- quote(color("red", tilde(a)) + color("rgb(255, 0, 0)", mean(X)) + 
+        color("#FF0000", boxed(c)) + color("hsl(0, 100%, 50%)", cancel(d)) + 
+        color("hwb(0 0% 0%)", prime(f)))
+math(term)
+```
 
 ## Operators and parentheses
 
@@ -196,10 +209,10 @@ Whereas in standard infix operators, the parentheses typically follow the rules
 for precedence, undesirable results may be obtained in custom operators.
 
 ```{r}
-term <- quote(mean(X) %+-% 1.96 * s / sqrt(N))
+term <- quote(mean(X) %+-% 2L * s / sqrt(N))
 math(term)
-term <- quote('%+-%'(mean(X), 1.96 * s / sqrt(N))) # functional form of '%+-%'
-term <- quote(mean(X) %+-% {1.96 * s / sqrt(N)})   # the same
+term <- quote('%+-%'(mean(X), 2L * s / sqrt(N))) # functional form of '%+-%'
+term <- quote(mean(X) %+-% {2L * s / sqrt(N)})   # the same
 math(term)
 ```
 
@@ -233,7 +246,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 op2 <- list(
   "A\\ !=\\ B"=quote(A != B),
@@ -254,7 +267,7 @@ op2 <- names(op2)
 if(knitr::is_latex_output())
   op2 <- sapply(op2, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op2 <- sapply(op2, FUN=knitr:::escape_html)
+  op2 <- sapply(op2, FUN=xfun::html_escape, attr=TRUE)
 
 op3 <- list(
   "A\\ %<->%\\ B"=quote(A %<->% B),
@@ -275,7 +288,7 @@ op3 <- names(op3)
 if(knitr::is_latex_output())
   op3 <- sapply(op3, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op3 <- sapply(op3, FUN=knitr:::escape_html)
+  op3 <- sapply(op3, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Operator=op1, Output=m1,
   Operator=op2, Output=m2,
@@ -323,7 +336,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 op2 <- list(
   "dbinom(k,\\ N,\\ pi)"=quote(dbinom(k, N, pi)),
@@ -348,7 +361,7 @@ op2 <- names(op2)
 if(knitr::is_latex_output())
   op2 <- sapply(op2, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op2 <- sapply(op2, FUN=knitr:::escape_html)
+  op2 <- sapply(op2, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Function=op1, Output=m1, Function=op2, Output=m2)
 knitr::kable(t, caption="Table 2. R functions from _base_ and _stats_",
@@ -477,10 +490,12 @@ In typical R\ functions, variable names are typically longer than just single
 letters, which may yield unsatisfactory results in the mathematical output.
 
 ```{r}
+term <- quote(dbinom(successes, Ntotal, prob))
 hook(successes, k)
 hook(quote(Ntotal), quote(N), quote=FALSE)
 hook(prob, pi)
-term <- quote(dbinom(successes, Ntotal, prob))
+math(term)
+hook(prob, p) # update hook
 math(term)
 ```
 
@@ -498,7 +513,15 @@ The hooks can also be used for more complex elements such as R\ calls, with
 dotted symbols representing Prolog variables.
 
 ```{r}
+term <- quote(pbinom(successes, Ntotal, prob))
 hook(pbinom(.K, .N, .P), sum_over(dbinom(i, .N, .P), i=0L, .K))
+math(term)
+```
+
+The old behavior is restored with `unhook(term)`.
+
+```{r}
+unhook(pbinom(.K, .N, .P))
 math(term)
 ```
 
@@ -573,7 +596,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Operation=op1, 
   "error\\ =\\ asis"=asis, highlight=high, fix=fix, ignore=igno)
@@ -589,16 +612,16 @@ Further customization requires the assertion of new Prolog rules `math/2`,
 This package allows R\ to render its terms in pretty mathematical equations. It
 extends the current features of R\ and existing packages for displaying
 mathematical formulas in R\ [@murrell2000], but most
-importantly, \pkg{mathml} bridges the gap between computational needs,
+importantly, _mathml_ bridges the gap between computational needs,
 presentation of results, and their reproducibility. The package supports both
 MathML and LaTeX/MathJax for use in R\ Markdown documents, presentations and
 Shiny App webpages.
 
 Researchers or teachers can already use R\ Markdown to conduct analyses and show
-results, and \pkg{mathml} smoothes this process and allows for integrated
+results, and _mathml_ smoothes this process and allows for integrated
 calculations and output. As shown in the case study of the previous
-section, \pkg{mathml} can help to improve data analyses and statistical reports
-from an aesthetical perspective, as well as regarding reproducibility of
+section, _mathml_ can help to improve data analyses and statistical reports
+from an aesthetic perspective, as well as regarding reproducibility of
 research.
 
 Furthermore, the package may also allow for a better detection of possible
@@ -638,40 +661,60 @@ f2 <- function(tau)
 math(f2)
 ````
 
-As the reader may know from own experience, missed parentheses are frequent
+As the reader may know from their own experience, missed parentheses are frequent
 causes of wrong results and errors that are hard to locate in programming code.
 This particular example shows that mathematical rendering can help to
 substantially reduce the amount of careless errors in programming.
 
 One limitation of the package is the lack of a convenient way to insert line
 breaks. This is mostly due to lacking support by MathML and LaTeX renderers. 
-For example, in its current stage, the LaTeX package `breqn` [@breqn] is mostly
-a proof of concept. Moreover, \pkg{mathml} is one-way road, that is, it is not 
-possible to translate from LaTeX or HTML back to R [see @latex2r, for an example].
+For example, in its current stage, the LaTeX package breqn [@breqn] is mostly
+a proof of concept. Moreover, _mathml_ only works in one direction,
+that is, it is not possible to translate from LaTeX or HTML back to R 
+[see @latex2r, for an example].
 
-The package \pkg{mathml} is available for R\ version 4.2 and later, and can be
+The package _mathml_ is available for R\ version 4.2 and later, and can be
 easily installed using the usual `install.packages("mathml")`. At its present
 stage, it supports output in HTML, LaTeX, and Microsoft 
 Word [via pandoc, @pandoc]. The source code of the package is found
 at https://github.com/mgondan/mathml.
 
-# Appendix: Customizing the package
+# Appendix A: For package developers
+
+If you use `mathml` for your own package, please do not "Import" `mathml` in
+your DESCRIPTION, but "Depend" on it.
+
+```
+Package: onmathml
+Type: Package
+Title: A package that uses mathml
+...
+Depends: 
+    R (>= 4.3),
+    mathml (>= 1.3)
+```
+
+It's not entirely clear why this is needed.
+
+# Appendix B: Customizing the package
 
 ## Implementation details
 
-For convenience, the translation of R\ expressions to mathematical output 
-is achieved through a Prolog interpreter from R\ package _rolog_ [@rolog]. 
-Prolog is a classical logic programming language with many applications 
-in expert systems, computer linguistics and symbolic artificial intelligence. 
-The main strength of Prolog is its concise representation of facts and rules 
-for knowledge and grammar, as well as its efficient built-in search engine for 
-closed world domains. As it is well-known, R\ is a statistical programming 
-language for data analysis and statistical modeling. Whereas Prolog is weak 
-in statistical computation, but strong in symbolic manipulation, the converse 
-may be said for the R\ language. The _rolog_ package bridges this gap by 
-providing an interface to a SWI-Prolog distribution [@swipl] in R. The 
-communication between the two systems is mainly in the form of queries from R\ 
-to Prolog, but two predicates allow Prolog to ring back and evaluate terms in R.
+For convenience, the translation of the R expressions is achieved through a
+Prolog interpreter provided by another R\ package _rolog_ [@rolog]. If a
+version of SWI-Prolog [@swipl] is found on the system, _rolog_ connects
+to it. Alternatively, the SWI-Prolog runtime libraries can be conveniently
+accessed by installing the R\ package _rswipl_ [@rswipl]. Prolog is a
+classical logic programming language with many applications in expert systems,
+computer linguistics and symbolic artificial intelligence. The strength of
+Prolog lies in its concise representation of facts and rules for knowledge and
+grammar, as well as its efficient built-in search engine for closed world
+domains. Whereas Prolog is weak in statistical computation, but strong in
+symbolic manipulation, the converse may be said for the R\ language. _rolog_
+bridges this gap by providing an interface to a SWI-Prolog
+distribution [@swipl] in R. The communication between the two systems is mainly
+in the form of queries from R\ to Prolog, but two Prolog functions allow ring
+back and evaluation of terms in R. 
 
 The proper term for a Prolog "function" is predicate, and it is typically
 written with name and arity (i.e., number of arguments), separated by a forward
@@ -713,7 +756,7 @@ In this appendix we describe a few more ways to extend the set of translations
 according to a user's needs. As stated in the background section, the Prolog end
 provides two classes of rules for translation, macros `math/2,3,4` mirroring the
 R\ hooks mentioned above, and the low-level predicates `ml/3` and `jax/3` that
-create proper MathML and LateX terms.
+create proper MathML and LaTeX terms.
 
 ## Linear models
 
@@ -731,7 +774,7 @@ The hook is simple, but is a bit limited because only R's tilde-form
 of linear models is shown, and it only works for a call with exactly two
 arguments.
 
-Below is an example how to build a linear equation of the
+Below is an example of how to build a linear equation of the
 form \(Y = b_0 + b_1X_1 + ...\) using the Prolog macros from _mathml_.
 
 ````prolog
@@ -760,7 +803,7 @@ Base R does not provide a function like `cuberoot(x)` or `nthroot(x, n)`, and
 the present package does not support the respective representation. To obtain a
 cube root, a programmer would typically type `x^(1/3)` or better `x^{1/3}` (see
 the practice section why the curly brace is preferred in an exponent), resulting
-in \(x^{1/3}\) which may still not match everyone's taste. Here describe the
+in \(x^{1/3}\) which may still not match everyone's taste. Here we describe the
 steps needed to represent the \(n\)-th root as \(\sqrt[n]x\).
 
 We assume that `nthroot(x, n)` is available in the current
@@ -791,7 +834,7 @@ mlx(nthroot(X, N), M, Flags) :-
 
 The explicit unification `M = ...` in the last line serves to avoid clutter in
 the head of `mlx/3`. The Prolog file `nthroot.pl` also includes the respective
-rule for LateX and can be consulted from the package folder via the underlying
+rule for LaTeX and can be consulted from the package folder via the underlying
 package _rolog_.
 
 ```{r}
@@ -815,6 +858,66 @@ first summand. Of course, _mathml_ is not a proper computer algebra system. As
 is illustrated by the other terms in the sum, such macros are limited to purely
 syntactical matching, and terms like `a^{1L/3L}` with the curly brace
 or `a^(1.0/3L)` with a floating point number in the numerator are not detected.
+
+## Proofs
+_Mathml_ provides a basic representation for proof trees in the sequent calculus. 
+The supported predicates are 'rbicond', 'rcond', 'rand', 'ror', 'rneg', 'lbicond', 
+'lcond', 'land', 'lor', 'lneg', each of which both in the variant with 2 and 3 arguments. 
+The first argument contains the expression for one line and the other arguments for everything above it (which can be other predicate of these). To prevent the precedence setting by R and instead enable 
+the precedences defined in Prolog, the prefix notation should be used.
+
+```{r}
+rolog::consult(system.file(file.path("pl", "bussproofs.pl"), package="mathml"))
+
+term <- quote(rcond('%>%'(P %->% P), ax(P %>% P, '')))
+math(term)
+
+term <- quote(ror('%>%'('', '%|%'(A, ~A)), 
+rneg('%>%'('', '%,%'(A, ~A)), 
+ax('%>%'(A, A), ''))))
+math(term)
+
+term <- quote(
+rcond('%>%'('%->%'('%|%'(A, B), ('&'(A, B)))), 
+rand('%>%'('%|%'(A, B), '&'(A, B)), 
+lor('%>%'('%|%'(A, B), A), 
+    ax('%>%'(A, A), ''), 
+    asq(B%<%A, '')), 
+lor(A%|%B%>%B, 
+    asq('%<%'(A, B), ''), 
+    ax('%>%'(B, B), '')))))
+math(term)
+```
+
+## P-values
+
+With pval/2, a value specified as first argument can be displayed with the
+following rounding rules:  
+
+* 0.1 < value < 1 : two digits  
+* 0.001 < value < 0.1 : three digits  
+* value < 0.0001 : output defaults to "< 0.0001". 
+
+The identifier for the value is provided as second argument.
+
+```{r}
+library(mathml)
+rolog::consult(system.file(file.path("pl", "pval.pl"), package="mathml"))
+
+term <- quote(pval(0.539, P))
+math(term)
+
+term <- quote(pval(0.0137, p))
+math(term)
+
+term <- quote(pval(0.0003, P))
+math(term)
+```
+
+The file `prolog/pval.pl` illustrates how to distinguish the above cases in
+Prolog. Two nested `math_hook` macros are used to decide if an equation sign
+is needed or the less-than sign, and to determine the number of decimal places
+shown.
 
 # Acknowledgment
 

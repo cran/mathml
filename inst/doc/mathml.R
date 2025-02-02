@@ -15,7 +15,7 @@ eval(term)
 library(mathml)
 mathjax(term)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 math(term)
 
 ## -----------------------------------------------------------------------------
@@ -33,6 +33,12 @@ term <- quote(tilde(a) + mean(X) + boxed(c) + cancel(d) + phantom(e) + prime(f))
 math(term)
 
 ## -----------------------------------------------------------------------------
+term <- quote(color("red", tilde(a)) + color("rgb(255, 0, 0)", mean(X)) + 
+        color("#FF0000", boxed(c)) + color("hsl(0, 100%, 50%)", cancel(d)) + 
+        color("hwb(0 0% 0%)", prime(f)))
+math(term)
+
+## -----------------------------------------------------------------------------
 term <- quote(a - ((b + c)) - d*e + f*(g + h) + i/j + k^(l + m) + (n*o)^{p + q})
 math(term)
 
@@ -44,10 +50,10 @@ term <- quote(a^(b + c))
 paste(term)
 
 ## -----------------------------------------------------------------------------
-term <- quote(mean(X) %+-% 1.96 * s / sqrt(N))
+term <- quote(mean(X) %+-% 2L * s / sqrt(N))
 math(term)
-term <- quote('%+-%'(mean(X), 1.96 * s / sqrt(N))) # functional form of '%+-%'
-term <- quote(mean(X) %+-% {1.96 * s / sqrt(N)})   # the same
+term <- quote('%+-%'(mean(X), 2L * s / sqrt(N))) # functional form of '%+-%'
+term <- quote(mean(X) %+-% {2L * s / sqrt(N)})   # the same
 math(term)
 
 ## ----custom-operators, echo=FALSE---------------------------------------------
@@ -70,7 +76,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 op2 <- list(
   "A\\ !=\\ B"=quote(A != B),
@@ -91,7 +97,7 @@ op2 <- names(op2)
 if(knitr::is_latex_output())
   op2 <- sapply(op2, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op2 <- sapply(op2, FUN=knitr:::escape_html)
+  op2 <- sapply(op2, FUN=xfun::html_escape, attr=TRUE)
 
 op3 <- list(
   "A\\ %<->%\\ B"=quote(A %<->% B),
@@ -112,7 +118,7 @@ op3 <- names(op3)
 if(knitr::is_latex_output())
   op3 <- sapply(op3, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op3 <- sapply(op3, FUN=knitr:::escape_html)
+  op3 <- sapply(op3, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Operator=op1, Output=m1,
   Operator=op2, Output=m2,
@@ -151,7 +157,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 op2 <- list(
   "dbinom(k,\\ N,\\ pi)"=quote(dbinom(k, N, pi)),
@@ -176,7 +182,7 @@ op2 <- names(op2)
 if(knitr::is_latex_output())
   op2 <- sapply(op2, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op2 <- sapply(op2, FUN=knitr:::escape_html)
+  op2 <- sapply(op2, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Function=op1, Output=m1, Function=op2, Output=m2)
 knitr::kable(t, caption="Table 2. R functions from _base_ and _stats_",
@@ -222,14 +228,21 @@ term <- call("+", A, B)
 math(term)
 
 ## -----------------------------------------------------------------------------
+term <- quote(dbinom(successes, Ntotal, prob))
 hook(successes, k)
 hook(quote(Ntotal), quote(N), quote=FALSE)
 hook(prob, pi)
-term <- quote(dbinom(successes, Ntotal, prob))
+math(term)
+hook(prob, p) # update hook
 math(term)
 
 ## -----------------------------------------------------------------------------
+term <- quote(pbinom(successes, Ntotal, prob))
 hook(pbinom(.K, .N, .P), sum_over(dbinom(i, .N, .P), i=0L, .K))
+math(term)
+
+## -----------------------------------------------------------------------------
+unhook(pbinom(.K, .N, .P))
 math(term)
 
 ## -----------------------------------------------------------------------------
@@ -270,7 +283,7 @@ op1 <- names(op1)
 if(knitr::is_latex_output())
   op1 <- sapply(op1, FUN=knitr:::escape_latex)
 if(knitr::is_html_output())
-  op1 <- sapply(op1, FUN=knitr:::escape_html)
+  op1 <- sapply(op1, FUN=xfun::html_escape, attr=TRUE)
 
 t <- cbind(Operation=op1, 
   "error\\ =\\ asis"=asis, highlight=high, fix=fix, ignore=igno)
@@ -321,5 +334,40 @@ rolog::consult(system.file(file.path("pl", "nthroot.pl"), package="mathml"))
 term <- quote(nthroot(a * (b + c), 3L)^2L)
 math(term)
 term <- quote(a^(1L/3L) + a^{1L/3L} + a^(1.0/3L))
+math(term)
+
+## -----------------------------------------------------------------------------
+rolog::consult(system.file(file.path("pl", "bussproofs.pl"), package="mathml"))
+
+term <- quote(rcond('%>%'(P %->% P), ax(P %>% P, '')))
+math(term)
+
+term <- quote(ror('%>%'('', '%|%'(A, ~A)), 
+rneg('%>%'('', '%,%'(A, ~A)), 
+ax('%>%'(A, A), ''))))
+math(term)
+
+term <- quote(
+rcond('%>%'('%->%'('%|%'(A, B), ('&'(A, B)))), 
+rand('%>%'('%|%'(A, B), '&'(A, B)), 
+lor('%>%'('%|%'(A, B), A), 
+    ax('%>%'(A, A), ''), 
+    asq(B%<%A, '')), 
+lor(A%|%B%>%B, 
+    asq('%<%'(A, B), ''), 
+    ax('%>%'(B, B), '')))))
+math(term)
+
+## -----------------------------------------------------------------------------
+library(mathml)
+rolog::consult(system.file(file.path("pl", "pval.pl"), package="mathml"))
+
+term <- quote(pval(0.539, P))
+math(term)
+
+term <- quote(pval(0.0137, p))
+math(term)
+
+term <- quote(pval(0.0003, P))
 math(term)
 
