@@ -242,6 +242,7 @@ hook(pbinom(.K, .N, .P), sum_over(dbinom(i, .N, .P), i=0L, .K))
 math(term)
 
 ## -----------------------------------------------------------------------------
+hooked(term)
 unhook(pbinom(.K, .N, .P))
 math(term)
 

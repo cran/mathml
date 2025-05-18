@@ -33,7 +33,7 @@ cases, these commands are tedious to type and their source code is hard to
 read.
 
 The present R\ package defines a set of rules for the automatic translation of
-R\ expressions to mathematical output in R\ Markdown documents [@Xie2020] and
+R\ expressions to mathematical output in RMarkdown documents [@Xie2020] and
 Shiny Apps [@Chang2022]. The translation is done by an embedded Prolog
 interpreter that maps nested expressions recursively to MathML and
 LaTeX/MathJax, respectively. User-defined hooks enable extension of the set of
@@ -95,7 +95,7 @@ necessary in edge cases. The package also includes a function `mathout()` that
 wraps a call to `mathml()` for HTML output and `mathjax()` for LaTeX output.
 Moreover, the function `math(x)` adds the class `"math"` to its argument, such
 that a special knitr printing function is
-invoked [see the vignette on custom print methods in @knitr]. An R\ Markdown
+invoked [see the vignette on custom print methods in @knitr]. An RMarkdown
 code chunk with `mathout(term)` thus produces:
 
 ````{r, echo=FALSE}
@@ -481,7 +481,7 @@ math(term)
 
 Note that the seemingly more convenient `term <- quote(A + B)` yields \(A + B\) in
 the output---instead of the desired matrix representation. This behavior is
-expected because quotation of R calls also quote the components of the
+expected because quotation of R calls also quotes the components of the
 call (here, _A_ and _B_).
 
 ## Short mathematical names for R symbols
@@ -518,9 +518,11 @@ hook(pbinom(.K, .N, .P), sum_over(dbinom(i, .N, .P), i=0L, .K))
 math(term)
 ```
 
-The old behavior is restored with `unhook(term)`.
+The replacement can be checked with `hooked(term)`, and the old behavior is
+restored with `unhook(term)`.
 
 ```{r}
+hooked(term)
 unhook(pbinom(.K, .N, .P))
 math(term)
 ```
@@ -614,10 +616,10 @@ extends the current features of R\ and existing packages for displaying
 mathematical formulas in R\ [@murrell2000], but most
 importantly, _mathml_ bridges the gap between computational needs,
 presentation of results, and their reproducibility. The package supports both
-MathML and LaTeX/MathJax for use in R\ Markdown documents, presentations and
+MathML and LaTeX/MathJax for use in RMarkdown documents, presentations and
 Shiny App webpages.
 
-Researchers or teachers can already use R\ Markdown to conduct analyses and show
+Researchers or teachers can already use RMarkdown to conduct analyses and show
 results, and _mathml_ smoothes this process and allows for integrated
 calculations and output. As shown in the case study of the previous
 section, _mathml_ can help to improve data analyses and statistical reports
@@ -891,14 +893,14 @@ math(term)
 
 ## P-values
 
-With pval/2, a value specified as first argument can be displayed with the
+With `pval/2`, a value specified as first argument can be displayed with the
 following rounding rules:  
 
 * 0.1 < value < 1 : two digits  
 * 0.001 < value < 0.1 : three digits  
-* value < 0.0001 : output defaults to "< 0.0001". 
+* value < 0.001 : output defaults to "< 0.001". 
 
-The identifier for the value is provided as second argument.
+The identifier, typically \(p\) or \(P\), is provided as the second argument.
 
 ```{r}
 library(mathml)
@@ -918,6 +920,10 @@ The file `prolog/pval.pl` illustrates how to distinguish the above cases in
 Prolog. Two nested `math_hook` macros are used to decide if an equation sign
 is needed or the less-than sign, and to determine the number of decimal places
 shown.
+
+The file also includes the convenience function `tstat/1` that rounds to two
+digits, and `percent/1` that displays a number as a
+percentage (e.g., 0.05 as 5%).
 
 # Acknowledgment
 

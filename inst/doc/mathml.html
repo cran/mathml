@@ -385,7 +385,7 @@ explicit LaTeX commands like
 basic use cases, these commands are tedious to type and their source
 code is hard to read.</p>
 <p>The present R package defines a set of rules for the automatic
-translation of R expressions to mathematical output in R Markdown
+translation of R expressions to mathematical output in RMarkdown
 documents <span class="citation">(Y. Xie, Dervieux, and Riederer
 2020)</span> and Shiny Apps <span class="citation">(Chang et al.
 2022)</span>. The translation is done by an embedded Prolog interpreter
@@ -441,7 +441,7 @@ but are necessary in edge cases. The package also includes a function
 HTML output and <code>mathjax()</code> for LaTeX output. Moreover, the
 function <code>math(x)</code> adds the class <code>&quot;math&quot;</code> to its
 argument, such that a special knitr printing function is invoked <span class="citation">(see the vignette on custom print methods in Yihui Xie
-2023)</span>. An R Markdown code chunk with <code>mathout(term)</code>
+2023)</span>. An RMarkdown code chunk with <code>mathout(term)</code>
 thus produces:</p>
 <p><math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>≤</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>p</mi></mrow></mrow><mo>)</mo></mrow></mrow></math></p>
 <p>Similarly, <code>inline()</code> produces inline output,
@@ -901,7 +901,7 @@ positional arguments into the renderer. For details, see the R function
 <p>Note that the seemingly more convenient
 <code>term &lt;- quote(A + B)</code> yields <span class="math inline">\(A + B\)</span> in the output—instead of the
 desired matrix representation. This behavior is expected because
-quotation of R calls also quote the components of the call (here,
+quotation of R calls also quotes the components of the call (here,
 <em>A</em> and <em>B</em>).</p>
 </div>
 <div id="short-mathematical-names-for-r-symbols" class="section level2">
@@ -933,9 +933,12 @@ with dotted symbols representing Prolog variables.</p>
 <span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">pbinom</span>(.K, .N, .P), <span class="fu">sum_over</span>(<span class="fu">dbinom</span>(i, .N, .P), <span class="at">i=</span><span class="dv">0</span><span class="dt">L</span>, .K))</span>
 <span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mi>k</mi></msubsup><mo>⁡</mo><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>=</mo><mi>i</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>p</mi></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math></p>
-<p>The old behavior is restored with <code>unhook(term)</code>.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">unhook</span>(<span class="fu">pbinom</span>(.K, .N, .P))</span>
-<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<p>The replacement can be checked with <code>hooked(term)</code>, and
+the old behavior is restored with <code>unhook(term)</code>.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">hooked</span>(term)</span></code></pre></div>
+<pre><code>## sum_over(dbinom(i, N, p), i = 0L, k)</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">unhook</span>(<span class="fu">pbinom</span>(.K, .N, .P))</span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><msub><mi>P</mi><mtext>Bi</mtext></msub><mo>⁡</mo><mrow><mo>(</mo><mrow><mrow><mi>X</mi><mo>≤</mo><mi>k</mi></mrow><mo>;</mo><mrow><mi>N</mi><mo>,</mo><mi>p</mi></mrow></mrow><mo>)</mo></mrow></mrow></math></p>
 </div>
 <div id="abbreviations" class="section level2">
@@ -948,22 +951,22 @@ comment is given with the expression for <span class="math inline">\(s^2_{\mathr
 <code>denote(abbr, expr, info)</code>, with <code>expr</code> actually
 being evaluated, <code>abbr</code> being rendered, plus a comment of the
 form “with <code>expr</code> denoting <code>info</code>”.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">hook</span>(m_A, <span class="fu">mean</span>(X)[<span class="st">&quot;A&quot;</span>]) ; <span class="fu">hook</span>(s2_A, s[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>) ;</span>
-<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="fu">hook</span>(n_A, n[<span class="st">&quot;A&quot;</span>])</span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="fu">hook</span>(m_B, <span class="fu">mean</span>(X)[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_B, s[<span class="st">&quot;B&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="fu">hook</span>(n_B, n[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_p, s[<span class="st">&quot;pool&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
-<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(t <span class="ot">&lt;-</span> <span class="fu">dfrac</span>(m_A <span class="sc">-</span> m_B, </span>
-<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a>    <span class="fu">sqrt</span>(<span class="fu">denote</span>(s2_p, <span class="fu">frac</span>((n_A <span class="sc">-</span> <span class="dv">1</span><span class="dt">L</span>)<span class="sc">*</span>s2_A <span class="sc">+</span> (n_B <span class="sc">-</span> <span class="dv">1</span><span class="dt">L</span>)<span class="sc">*</span>s2_B, n_A <span class="sc">+</span> n_B <span class="sc">-</span> <span class="dv">2</span><span class="dt">L</span>),</span>
-<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a>                <span class="st">&quot;the pooled variance.&quot;</span>) <span class="sc">*</span> (<span class="fu">frac</span>(<span class="dv">1</span><span class="dt">L</span>, n_A) <span class="sc">+</span> <span class="fu">frac</span>(<span class="dv">1</span><span class="dt">L</span>, n_B)))))</span>
-<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">hook</span>(m_A, <span class="fu">mean</span>(X)[<span class="st">&quot;A&quot;</span>]) ; <span class="fu">hook</span>(s2_A, s[<span class="st">&quot;A&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>) ;</span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a><span class="fu">hook</span>(n_A, n[<span class="st">&quot;A&quot;</span>])</span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a><span class="fu">hook</span>(m_B, <span class="fu">mean</span>(X)[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_B, s[<span class="st">&quot;B&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a><span class="fu">hook</span>(n_B, n[<span class="st">&quot;B&quot;</span>]) ; <span class="fu">hook</span>(s2_p, s[<span class="st">&quot;pool&quot;</span>]<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(t <span class="ot">&lt;-</span> <span class="fu">dfrac</span>(m_A <span class="sc">-</span> m_B, </span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>    <span class="fu">sqrt</span>(<span class="fu">denote</span>(s2_p, <span class="fu">frac</span>((n_A <span class="sc">-</span> <span class="dv">1</span><span class="dt">L</span>)<span class="sc">*</span>s2_A <span class="sc">+</span> (n_B <span class="sc">-</span> <span class="dv">1</span><span class="dt">L</span>)<span class="sc">*</span>s2_B, n_A <span class="sc">+</span> n_B <span class="sc">-</span> <span class="dv">2</span><span class="dt">L</span>),</span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>                <span class="st">&quot;the pooled variance.&quot;</span>) <span class="sc">*</span> (<span class="fu">frac</span>(<span class="dv">1</span><span class="dt">L</span>, n_A) <span class="sc">+</span> <span class="fu">frac</span>(<span class="dv">1</span><span class="dt">L</span>, n_B)))))</span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>t</mi><mo>=</mo><mstyle displaystyle="true"><mfrac><mrow><msub><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mtext>A</mtext></msub><mo>-</mo><msub><mover accent="true"><mi>X</mi><mo>¯</mo></mover><mtext>B</mtext></msub></mrow><msqrt><mrow><msubsup><mi>s</mi><mtext>pool</mtext><mn>2</mn></msubsup><mo>⋅</mo><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><msub><mi>n</mi><mtext>A</mtext></msub></mfrac><mo>+</mo><mfrac><mn>1</mn><msub><mi>n</mi><mtext>B</mtext></msub></mfrac></mrow><mo>)</mo></mrow></mrow></msqrt></mfrac></mstyle></mrow></math><span>,
 with <span><math><mrow><msubsup><mi>s</mi><mtext>pool</mtext><mn>2</mn></msubsup><mo>=</mo><mfrac><mrow><mrow><mrow><mo>(</mo><mrow><msub><mi>n</mi><mtext>A</mtext></msub><mo>-</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo>⋅</mo><msubsup><mi>s</mi><mtext>A</mtext><mn>2</mn></msubsup></mrow><mo>+</mo><mrow><mrow><mo>(</mo><mrow><msub><mi>n</mi><mtext>B</mtext></msub><mo>-</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo>⋅</mo><msubsup><mi>s</mi><mtext>B</mtext><mn>2</mn></msubsup></mrow></mrow><mrow><mrow><msub><mi>n</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>n</mi><mtext>B</mtext></msub></mrow><mo>-</mo><mn>2</mn></mrow></mfrac></mrow></math>
 denoting the pooled variance.</span></span></p>
 <p>The term is evaluated below. <code>print()</code> is needed because
 the return value of an assignment of the form
 <code>t &lt;- dfrac(...)</code> is not visible in R.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>m_A <span class="ot">&lt;-</span> <span class="fl">1.5</span>; s2_A <span class="ot">&lt;-</span> <span class="fl">2.4</span><span class="sc">^</span><span class="dv">2</span>; n_A <span class="ot">&lt;-</span> <span class="dv">27</span>; m_B <span class="ot">&lt;-</span> <span class="fl">3.9</span>; s2_B <span class="ot">&lt;-</span> <span class="fl">2.8</span><span class="sc">^</span><span class="dv">2</span>; n_B <span class="ot">&lt;-</span> <span class="dv">20</span></span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">eval</span>(term))</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>m_A <span class="ot">&lt;-</span> <span class="fl">1.5</span>; s2_A <span class="ot">&lt;-</span> <span class="fl">2.4</span><span class="sc">^</span><span class="dv">2</span>; n_A <span class="ot">&lt;-</span> <span class="dv">27</span>; m_B <span class="ot">&lt;-</span> <span class="fl">3.9</span>; s2_B <span class="ot">&lt;-</span> <span class="fl">2.8</span><span class="sc">^</span><span class="dv">2</span>; n_B <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">eval</span>(term))</span></code></pre></div>
 <pre><code>## [1] -3.157427</code></pre>
 </div>
 <div id="context-dependent-rendering" class="section level2">
@@ -971,10 +974,10 @@ the return value of an assignment of the form
 <p>Consider an educational scenario in which we want to highlight a
 certain element of a term, for example, that a student has forgotten to
 subtract the null hypothesis in a <span class="math inline">\(t\)</span>-ratio:</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dfrac</span>(<span class="fu">omit_right</span>(<span class="fu">mean</span>(D) <span class="sc">-</span> mu[<span class="dv">0</span><span class="dt">L</span>]), s <span class="sc">/</span> <span class="fu">sqrt</span>(N)))</span>
-<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a><span class="fu">math</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;highlight&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">dfrac</span>(<span class="fu">omit_right</span>(<span class="fu">mean</span>(D) <span class="sc">-</span> mu[<span class="dv">0</span><span class="dt">L</span>]), s <span class="sc">/</span> <span class="fu">sqrt</span>(N)))</span>
+<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a><span class="fu">math</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;highlight&quot;</span>))</span></code></pre></div>
 <p><math><mstyle displaystyle="true"><mfrac><mrow><mover accent="true"><mi>D</mi><mo>¯</mo></mover><mspace width="thinmathspace"></mspace><menclose notation="updiagonalstrike"><mrow><mo>-</mo><mspace width="thinmathspace"></mspace><msub><mi>μ</mi><mn>0</mn></msub></mrow></menclose></mrow><mrow><mi>s</mi><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></mfrac></mstyle></math></p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">math</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;fix&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="fu">math</span>(t, <span class="at">flags=</span><span class="fu">list</span>(<span class="at">error=</span><span class="st">&quot;fix&quot;</span>))</span></code></pre></div>
 <p><math><mstyle displaystyle="true"><mfrac><mrow><mover accent="true"><mi>D</mi><mo>¯</mo></mover><mspace width="thinmathspace"></mspace><menclose notation="roundedbox"><mrow><mo>-</mo><mspace width="thinmathspace"></mspace><msub><mi>μ</mi><mn>0</mn></msub></mrow></menclose></mrow><mrow><mi>s</mi><mo>/</mo><msqrt><mi>N</mi></msqrt></mrow></mfrac></mstyle></math></p>
 <p>The R function <code>omit_right(a + b)</code> uses non-standard
 evaluation techniques <span class="citation">(e.g., Wickham 2019)</span>
@@ -1069,46 +1072,46 @@ equations. It extends the current features of R and existing packages
 for displaying mathematical formulas in R <span class="citation">(Murrell and Ihaka 2000)</span>, but most importantly,
 <em>mathml</em> bridges the gap between computational needs,
 presentation of results, and their reproducibility. The package supports
-both MathML and LaTeX/MathJax for use in R Markdown documents,
+both MathML and LaTeX/MathJax for use in RMarkdown documents,
 presentations and Shiny App webpages.</p>
-<p>Researchers or teachers can already use R Markdown to conduct
-analyses and show results, and <em>mathml</em> smoothes this process and
-allows for integrated calculations and output. As shown in the case
-study of the previous section, <em>mathml</em> can help to improve data
-analyses and statistical reports from an aesthetic perspective, as well
-as regarding reproducibility of research.</p>
+<p>Researchers or teachers can already use RMarkdown to conduct analyses
+and show results, and <em>mathml</em> smoothes this process and allows
+for integrated calculations and output. As shown in the case study of
+the previous section, <em>mathml</em> can help to improve data analyses
+and statistical reports from an aesthetic perspective, as well as
+regarding reproducibility of research.</p>
 <p>Furthermore, the package may also allow for a better detection of
 possible mistakes in R programs. Similar to most programming languages
 <span class="citation">(Green 1977)</span>, R code is notoriously hard
 to read, and the poor legibility of the language is one of the main
 sources of mistakes. For illustration, we consider again Equation 10 in
 Schwarz <span class="citation">(1994)</span>.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="fu">hook</span>(mu_A, mu[<span class="st">&quot;A&quot;</span>])</span>
-<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a><span class="fu">hook</span>(mu_B, mu[<span class="st">&quot;B&quot;</span>])</span>
-<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a><span class="fu">hook</span>(sigma_A, sigma[<span class="st">&quot;A&quot;</span>])</span>
-<span id="cb42-4"><a href="#cb42-4" tabindex="-1"></a><span class="fu">hook</span>(sigma_B, sigma[<span class="st">&quot;B&quot;</span>])</span>
-<span id="cb42-5"><a href="#cb42-5" tabindex="-1"></a></span>
-<span id="cb42-6"><a href="#cb42-6" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
-<span id="cb42-7"><a href="#cb42-7" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A <span class="sc">+</span> mu_B) <span class="sc">*</span> </span>
-<span id="cb42-8"><a href="#cb42-8" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))</span>
-<span id="cb42-9"><a href="#cb42-9" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(<span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>))</span>
-<span id="cb42-10"><a href="#cb42-10" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))))</span>
-<span id="cb42-11"><a href="#cb42-11" tabindex="-1"></a>}</span>
-<span id="cb42-12"><a href="#cb42-12" tabindex="-1"></a></span>
-<span id="cb42-13"><a href="#cb42-13" tabindex="-1"></a><span class="fu">math</span>(f1)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">hook</span>(mu_A, mu[<span class="st">&quot;A&quot;</span>])</span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a><span class="fu">hook</span>(mu_B, mu[<span class="st">&quot;B&quot;</span>])</span>
+<span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a><span class="fu">hook</span>(sigma_A, sigma[<span class="st">&quot;A&quot;</span>])</span>
+<span id="cb44-4"><a href="#cb44-4" tabindex="-1"></a><span class="fu">hook</span>(sigma_B, sigma[<span class="st">&quot;B&quot;</span>])</span>
+<span id="cb44-5"><a href="#cb44-5" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
+<span id="cb44-7"><a href="#cb44-7" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A <span class="sc">+</span> mu_B) <span class="sc">*</span> </span>
+<span id="cb44-8"><a href="#cb44-8" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))</span>
+<span id="cb44-9"><a href="#cb44-9" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(<span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>))</span>
+<span id="cb44-10"><a href="#cb44-10" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))))</span>
+<span id="cb44-11"><a href="#cb44-11" tabindex="-1"></a>}</span>
+<span id="cb44-12"><a href="#cb44-12" tabindex="-1"></a></span>
+<span id="cb44-13"><a href="#cb44-13" tabindex="-1"></a><span class="fu">math</span>(f1)</span></code></pre></div>
 <p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>+</mo><mrow><mo>{</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>-</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>μ</mi><mtext>B</mtext></msub></mrow></mfrac></mstyle><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><msub><mi>μ</mi><mtext>A</mtext></msub></mrow><mo>⁢</mo><mi>τ</mi></mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow><mo>}</mo></mrow></mrow></math></p>
 <p>The first version has a wrong parenthesis, which is barely visible in
 the code, whereas in the mathematical representation, the wrong curly
 brace is immediately obvious (the correct version is shown below for
 comparison).</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
-<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A <span class="sc">+</span> mu_B)) <span class="sc">*</span> </span>
-<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))</span>
-<span id="cb43-4"><a href="#cb43-4" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(<span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>))</span>
-<span id="cb43-5"><a href="#cb43-5" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau))))</span>
-<span id="cb43-6"><a href="#cb43-6" tabindex="-1"></a>}</span>
-<span id="cb43-7"><a href="#cb43-7" tabindex="-1"></a></span>
-<span id="cb43-8"><a href="#cb43-8" tabindex="-1"></a><span class="fu">math</span>(f2)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(tau)</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>{ <span class="fu">dfrac</span>(c, mu_A) <span class="sc">+</span> (<span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A) <span class="sc">-</span> <span class="fu">dfrac</span>(<span class="dv">1</span><span class="dt">L</span>, mu_A <span class="sc">+</span> mu_B)) <span class="sc">*</span> </span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>    ((mu_A<span class="sc">*</span>tau <span class="sc">-</span> c) <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau)))</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>      <span class="sc">-</span> (mu_A<span class="sc">*</span>tau <span class="sc">+</span> c) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">dfrac</span>(<span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>mu_A<span class="sc">*</span>tau, sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>))</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a>        <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fu">dfrac</span>(<span class="sc">-</span>c <span class="sc">-</span> mu_A<span class="sc">*</span>tau, <span class="fu">sqrt</span>(sigma_A<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span><span class="sc">*</span>tau))))</span>
+<span id="cb45-6"><a href="#cb45-6" tabindex="-1"></a>}</span>
+<span id="cb45-7"><a href="#cb45-7" tabindex="-1"></a></span>
+<span id="cb45-8"><a href="#cb45-8" tabindex="-1"></a><span class="fu">math</span>(f2)</span></code></pre></div>
 <p><math><mrow><mstyle displaystyle="true"><mfrac><mi>c</mi><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>+</mo><mrow><mrow><mo>(</mo><mrow><mstyle displaystyle="true"><mfrac><mn>1</mn><msub><mi>μ</mi><mtext>A</mtext></msub></mfrac></mstyle><mo>-</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>+</mo><msub><mi>μ</mi><mtext>B</mtext></msub></mrow></mfrac></mstyle></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mo>[</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>-</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mi>c</mi><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>-</mo><mrow><mrow><mrow><mo>(</mo><mrow><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow><mo>⋅</mo><mrow><mi>exp</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mn>2</mn><mo>⁢</mo><msub><mi>μ</mi><mtext>A</mtext></msub></mrow><mo>⁢</mo><mi>τ</mi></mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow><mo>⋅</mo><mrow><mi>Φ</mi><mo>⁡</mo><mrow><mo>(</mo><mstyle displaystyle="true"><mfrac><mrow><mrow><mo>-</mo><mi>c</mi></mrow><mo>-</mo><mrow><msub><mi>μ</mi><mtext>A</mtext></msub><mo>⁢</mo><mi>τ</mi></mrow></mrow><msqrt><mrow><msubsup><mi>σ</mi><mtext>A</mtext><mn>2</mn></msubsup><mo>⁢</mo><mi>τ</mi></mrow></msqrt></mfrac></mstyle><mo>)</mo></mrow></mrow></mrow></mrow><mo>]</mo></mrow></mrow></mrow></math></p>
 <p>As the reader may know from their own experience, missed parentheses
 are frequent causes of wrong results and errors that are hard to locate
@@ -1172,17 +1175,17 @@ separated by a forward slash. Thus, at the Prolog end, a predicate
 into a “function” <code>fn/2</code> with the name <code>P_Bi</code>, one
 argument <code>X =&lt; K</code>, and the two parameters <code>N</code>
 and <code>Pi</code>.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>math(pbinom(<span class="dt">K</span><span class="kw">,</span> <span class="dt">N</span><span class="kw">,</span> <span class="dt">Pi</span>)<span class="kw">,</span> <span class="dt">M</span>)</span>
-<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a> =&gt; <span class="dt">M</span> <span class="kw">=</span> fn(subscript(<span class="st">&#39;</span><span class="er">P</span><span class="st">&#39;</span><span class="kw">,</span> <span class="ot">&quot;</span><span class="er">Bi</span><span class="ot">&quot;</span>)<span class="kw">,</span> ([<span class="st">&#39;</span><span class="er">X</span><span class="st">&#39;</span> <span class="dt">=&lt;</span> <span class="dt">K</span>] <span class="kw">;</span> [<span class="dt">N</span>, <span class="dt">Pi</span>]))<span class="kw">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a>math(pbinom(<span class="dt">K</span><span class="kw">,</span> <span class="dt">N</span><span class="kw">,</span> <span class="dt">Pi</span>)<span class="kw">,</span> <span class="dt">M</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a> =&gt; <span class="dt">M</span> <span class="kw">=</span> fn(subscript(<span class="st">&#39;</span><span class="er">P</span><span class="st">&#39;</span><span class="kw">,</span> <span class="ot">&quot;</span><span class="er">Bi</span><span class="ot">&quot;</span>)<span class="kw">,</span> ([<span class="st">&#39;</span><span class="er">X</span><span class="st">&#39;</span> <span class="dt">=&lt;</span> <span class="dt">K</span>] <span class="kw">;</span> [<span class="dt">N</span>, <span class="dt">Pi</span>]))<span class="kw">.</span></span></code></pre></div>
 <p><code>math/2</code> operates like a “macro” that translates one
 mathematical element (here, <code>pbinom(K, N, Pi)</code>) to a
 different mathematical element, namely
 <code>fn(Name, (Args ; Pars))</code>. The low-level predicate
 <code>ml/3</code> is used to convert these basic elements to MathML.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>ml(<span class="dt">Flags</span><span class="kw">,</span> fn(<span class="dt">Name</span><span class="kw">,</span> (<span class="dt">Args</span> <span class="kw">;</span> <span class="dt">Pars</span>))<span class="kw">,</span> <span class="dt">M</span>)</span>
-<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a> =&gt; ml(<span class="dt">Flags</span><span class="kw">,</span> <span class="dt">Name</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span></span>
-<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a>    ml(<span class="dt">Flags</span><span class="kw">,</span> paren(list(<span class="fu">op</span>(<span class="kw">;</span>)<span class="kw">,</span> [list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Args</span>), list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Pars</span>)]))<span class="kw">,</span> <span class="dt">X</span>)<span class="kw">,</span></span>
-<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mrow([<span class="dt">N</span>, mo(&amp;(af)), <span class="dt">X</span>])<span class="kw">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>ml(<span class="dt">Flags</span><span class="kw">,</span> fn(<span class="dt">Name</span><span class="kw">,</span> (<span class="dt">Args</span> <span class="kw">;</span> <span class="dt">Pars</span>))<span class="kw">,</span> <span class="dt">M</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a> =&gt; ml(<span class="dt">Flags</span><span class="kw">,</span> <span class="dt">Name</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span></span>
+<span id="cb48-3"><a href="#cb48-3" tabindex="-1"></a>    ml(<span class="dt">Flags</span><span class="kw">,</span> paren(list(<span class="fu">op</span>(<span class="kw">;</span>)<span class="kw">,</span> [list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Args</span>), list(<span class="fu">op</span>(<span class="st">&#39;,&#39;</span>)<span class="kw">,</span> <span class="dt">Pars</span>)]))<span class="kw">,</span> <span class="dt">X</span>)<span class="kw">,</span></span>
+<span id="cb48-4"><a href="#cb48-4" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mrow([<span class="dt">N</span>, mo(&amp;(af)), <span class="dt">X</span>])<span class="kw">.</span></span></code></pre></div>
 <p>The relevant rule for <code>ml/3</code> builds the MathML entity
 <code>mrow([N, mo(&amp;(af)), X])</code>, with <code>N</code>
 representing the name of the function and <code>X</code> its arguments
@@ -1212,27 +1215,27 @@ sufficient to map the <code>Formula</code> in
 <code>lm(Formula, Data)</code> to its respective equation <span class="citation">(see also Anderson, Heiss, and Sumners 2023)</span>.
 This can in two ways, using either the hooks described above, or a new
 <code>math/2</code> macro at the Prolog end.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">lm</span>(.Formula, .Data), .Formula)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="fu">hook</span>(<span class="fu">lm</span>(.Formula, .Data), .Formula)</span></code></pre></div>
 <p>The hook is simple, but is a bit limited because only R’s tilde-form
 of linear models is shown, and it only works for a call with exactly two
 arguments.</p>
 <p>Below is an example of how to build a linear equation of the form
 <span class="math inline">\(Y = b_0 + b_1X_1 + ...\)</span> using the
 Prolog macros from <em>mathml</em>.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>math_hook(<span class="dt">LM</span><span class="kw">,</span> <span class="dt">M</span>) <span class="kw">:-</span></span>
-<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a>    <span class="dt">compound</span>(<span class="dt">LM</span>)<span class="kw">,</span></span>
-<span id="cb48-3"><a href="#cb48-3" tabindex="-1"></a>    <span class="dt">LM</span> <span class="fu">=..</span> [lm, ~(<span class="dt">Y</span><span class="kw">,</span> <span class="dt">Sum</span>) <span class="fu">|</span> <span class="dt">_Tail</span>]<span class="kw">,</span></span>
-<span id="cb48-4"><a href="#cb48-4" tabindex="-1"></a>    summands(<span class="dt">Sum</span><span class="kw">,</span> <span class="dt">Predictors</span>)<span class="kw">,</span></span>
-<span id="cb48-5"><a href="#cb48-5" tabindex="-1"></a>    findall(subscript(b<span class="kw">,</span> <span class="dt">X</span>) <span class="fu">*</span> <span class="dt">X</span><span class="kw">,</span> member(<span class="dt">X</span><span class="kw">,</span> <span class="dt">Predictors</span>)<span class="kw">,</span> <span class="dt">Terms</span>)<span class="kw">,</span></span>
-<span id="cb48-6"><a href="#cb48-6" tabindex="-1"></a>    summands(<span class="dt">Model</span><span class="kw">,</span> <span class="dt">Terms</span>)<span class="kw">,</span></span>
-<span id="cb48-7"><a href="#cb48-7" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> (<span class="dt">Y</span> <span class="fu">==</span> subscript(b<span class="kw">,</span> <span class="dv">0</span>) <span class="fu">+</span> <span class="dt">Model</span> <span class="fu">+</span> epsilon)<span class="kw">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a>math_hook(<span class="dt">LM</span><span class="kw">,</span> <span class="dt">M</span>) <span class="kw">:-</span></span>
+<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a>    <span class="dt">compound</span>(<span class="dt">LM</span>)<span class="kw">,</span></span>
+<span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a>    <span class="dt">LM</span> <span class="fu">=..</span> [lm, ~(<span class="dt">Y</span><span class="kw">,</span> <span class="dt">Sum</span>) <span class="fu">|</span> <span class="dt">_Tail</span>]<span class="kw">,</span></span>
+<span id="cb50-4"><a href="#cb50-4" tabindex="-1"></a>    summands(<span class="dt">Sum</span><span class="kw">,</span> <span class="dt">Predictors</span>)<span class="kw">,</span></span>
+<span id="cb50-5"><a href="#cb50-5" tabindex="-1"></a>    findall(subscript(b<span class="kw">,</span> <span class="dt">X</span>) <span class="fu">*</span> <span class="dt">X</span><span class="kw">,</span> member(<span class="dt">X</span><span class="kw">,</span> <span class="dt">Predictors</span>)<span class="kw">,</span> <span class="dt">Terms</span>)<span class="kw">,</span></span>
+<span id="cb50-6"><a href="#cb50-6" tabindex="-1"></a>    summands(<span class="dt">Model</span><span class="kw">,</span> <span class="dt">Terms</span>)<span class="kw">,</span></span>
+<span id="cb50-7"><a href="#cb50-7" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> (<span class="dt">Y</span> <span class="fu">==</span> subscript(b<span class="kw">,</span> <span class="dv">0</span>) <span class="fu">+</span> <span class="dt">Model</span> <span class="fu">+</span> epsilon)<span class="kw">.</span></span></code></pre></div>
 <p>The predicate <code>summands/2</code> unpacks an expression
 <code>A + B + C</code> to a list <code>[C, B, A]</code> and vice-versa
 (see the file <code>lm.pl</code> for details).</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;lm.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
-<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a></span>
-<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">lm</span>(EOT <span class="sc">~</span> T0 <span class="sc">+</span> Therapy, <span class="at">data=</span>d, <span class="at">na.action=</span>na.fail))</span>
-<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;lm.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
+<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">lm</span>(EOT <span class="sc">~</span> T0 <span class="sc">+</span> Therapy, <span class="at">data=</span>d, <span class="at">na.action=</span>na.fail))</span>
+<span id="cb51-4"><a href="#cb51-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>EOT</mi><mo>=</mo><mrow><mrow><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><mrow><mrow><msub><mi>b</mi><mi>T0</mi></msub><mo>⁢</mo><mi>T0</mi></mrow><mo>+</mo><mrow><msub><mi>b</mi><mi>Therapy</mi></msub><mo>⁢</mo><mi>Therapy</mi></mrow></mrow></mrow><mo>+</mo><mi>ε</mi></mrow></mrow></math></p>
 </div>
 <div id="n-th-root" class="section level2">
@@ -1252,11 +1255,11 @@ arguments and their order are accessible to <code>canonical()</code> if
 needed. As we can see below, <em>mathml</em> uses a default
 representation <code>name(arguments)</code> for such unknown
 functions.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a>nthroot <span class="ot">&lt;-</span> <span class="cf">function</span>(x, n)</span>
-<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a>  x<span class="sc">^</span>{<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span>n}</span>
-<span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a></span>
-<span id="cb50-4"><a href="#cb50-4" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">canonical</span>(<span class="fu">quote</span>(<span class="fu">nthroot</span>(<span class="at">n=</span><span class="dv">3</span><span class="dt">L</span>, <span class="dv">2</span><span class="dt">L</span>)))</span>
-<span id="cb50-5"><a href="#cb50-5" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>nthroot <span class="ot">&lt;-</span> <span class="cf">function</span>(x, n)</span>
+<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a>  x<span class="sc">^</span>{<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span>n}</span>
+<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">canonical</span>(<span class="fu">quote</span>(<span class="fu">nthroot</span>(<span class="at">n=</span><span class="dv">3</span><span class="dt">L</span>, <span class="dv">2</span><span class="dt">L</span>)))</span>
+<span id="cb52-5"><a href="#cb52-5" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>nthroot</mi><mo>⁡</mo><mrow><mo>(</mo><mrow><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>)</mo></mrow></mrow></math></p>
 <p>A proper MathML term is obtained by <code>mlx/3</code> (the x in mlx
 indicates that it is an extension and is prioritized over the default
@@ -1264,22 +1267,22 @@ ml/3 rules). <code>mlx/3</code> recursively invokes <code>ml/3</code>
 for translating the function arguments <em>X</em> and <em>N</em>, and
 then constructs the correct MathML entity
 <code>&lt;mroot&gt;...&lt;/mroot&gt;</code>.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>mlx(nthroot(<span class="dt">X</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span> <span class="dt">M</span><span class="kw">,</span> <span class="dt">Flags</span>) <span class="kw">:-</span></span>
-<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a>    ml(<span class="dt">X</span><span class="kw">,</span> <span class="dt">X1</span><span class="kw">,</span> <span class="dt">Flags</span>)<span class="kw">,</span></span>
-<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a>    ml(<span class="dt">N</span><span class="kw">,</span> <span class="dt">N1</span><span class="kw">,</span> <span class="dt">Flags</span>)<span class="kw">,</span></span>
-<span id="cb51-4"><a href="#cb51-4" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mroot([<span class="dt">X1</span>, <span class="dt">N1</span>])<span class="kw">.</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode prolog"><code class="sourceCode prolog"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>mlx(nthroot(<span class="dt">X</span><span class="kw">,</span> <span class="dt">N</span>)<span class="kw">,</span> <span class="dt">M</span><span class="kw">,</span> <span class="dt">Flags</span>) <span class="kw">:-</span></span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>    ml(<span class="dt">X</span><span class="kw">,</span> <span class="dt">X1</span><span class="kw">,</span> <span class="dt">Flags</span>)<span class="kw">,</span></span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>    ml(<span class="dt">N</span><span class="kw">,</span> <span class="dt">N1</span><span class="kw">,</span> <span class="dt">Flags</span>)<span class="kw">,</span></span>
+<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>    <span class="dt">M</span> <span class="kw">=</span> mroot([<span class="dt">X1</span>, <span class="dt">N1</span>])<span class="kw">.</span></span></code></pre></div>
 <p>The explicit unification <code>M = ...</code> in the last line serves
 to avoid clutter in the head of <code>mlx/3</code>. The Prolog file
 <code>nthroot.pl</code> also includes the respective rule for LaTeX and
 can be consulted from the package folder via the underlying package
 <em>rolog</em>.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;nthroot.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
-<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a></span>
-<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">nthroot</span>(a <span class="sc">*</span> (b <span class="sc">+</span> c), <span class="dv">3</span><span class="dt">L</span>)<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
-<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;nthroot.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">nthroot</span>(a <span class="sc">*</span> (b <span class="sc">+</span> c), <span class="dv">3</span><span class="dt">L</span>)<span class="sc">^</span><span class="dv">2</span><span class="dt">L</span>)</span>
+<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><msup><mrow><mo>[</mo><mroot><mrow><mi>a</mi><mo>⋅</mo><mrow><mo>(</mo><mrow><mi>b</mi><mo>+</mo><mi>c</mi></mrow><mo>)</mo></mrow></mrow><mn>3</mn></mroot><mo>]</mo></mrow><mn>2</mn></msup></math></p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a<span class="sc">^</span>(<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>) <span class="sc">+</span> a<span class="sc">^</span>{<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>} <span class="sc">+</span> a<span class="sc">^</span>(<span class="fl">1.0</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>))</span>
-<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(a<span class="sc">^</span>(<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>) <span class="sc">+</span> a<span class="sc">^</span>{<span class="dv">1</span><span class="dt">L</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>} <span class="sc">+</span> a<span class="sc">^</span>(<span class="fl">1.0</span><span class="sc">/</span><span class="dv">3</span><span class="dt">L</span>))</span>
+<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mroot><mi>a</mi><mn>3</mn></mroot><mo>+</mo><msup><mi>a</mi><mrow><mn>1</mn><mo>/</mo><mn>3</mn></mrow></msup></mrow><mo>+</mo><msup><mi>a</mi><mrow><mo>(</mo><mrow><mn>1.0000000</mn><mo>/</mo><mn>3</mn></mrow><mo>)</mo></mrow></msup></mrow></math></p>
 <p>The file <code>nthroot.pl</code> includes three more statements
 <code>precx/3</code> and <code>parenx/3</code>, as well as a
@@ -1307,56 +1310,61 @@ contains the expression for one line and the other arguments for
 everything above it (which can be other predicate of these). To prevent
 the precedence setting by R and instead enable the precedences defined
 in Prolog, the prefix notation should be used.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;bussproofs.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">rcond</span>(<span class="st">&#39;%&gt;%&#39;</span>(P <span class="sc">%-&gt;%</span> P), <span class="fu">ax</span>(P <span class="sc">%&gt;%</span> P, <span class="st">&#39;&#39;</span>)))</span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;bussproofs.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
+<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a></span>
+<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">rcond</span>(<span class="st">&#39;%&gt;%&#39;</span>(P <span class="sc">%-&gt;%</span> P), <span class="fu">ax</span>(P <span class="sc">%&gt;%</span> P, <span class="st">&#39;&#39;</span>)))</span>
+<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>P</mi><mo>⊢</mo><mi>P</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Ax.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mo>⊢</mo><mrow><mi>P</mi><mo>→</mo><mi>P</mi></mrow></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>R</mi><mo>→</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></math></p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">ror</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;&#39;</span>, <span class="st">&#39;%|%&#39;</span>(A, <span class="sc">~</span>A)), </span>
-<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a><span class="fu">rneg</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;&#39;</span>, <span class="st">&#39;%,%&#39;</span>(A, <span class="sc">~</span>A)), </span>
-<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a><span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(A, A), <span class="st">&#39;&#39;</span>))))</span>
-<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">ror</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;&#39;</span>, <span class="st">&#39;%|%&#39;</span>(A, <span class="sc">~</span>A)), </span>
+<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a><span class="fu">rneg</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;&#39;</span>, <span class="st">&#39;%,%&#39;</span>(A, <span class="sc">~</span>A)), </span>
+<span id="cb57-3"><a href="#cb57-3" tabindex="-1"></a><span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(A, A), <span class="st">&#39;&#39;</span>))))</span>
+<span id="cb57-4"><a href="#cb57-4" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>A</mi><mo>⊢</mo><mi>A</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Ax.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mtext></mtext><mo>⊢</mo><mrow><mi>A</mi><mo>,</mo><mrow><mo>¬</mo><mi>A</mi></mrow></mrow></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>R</mi><mo>¬</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mtext></mtext><mo>⊢</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo>¬</mo><mi>A</mi></mrow></mrow></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>R</mi><mo>∨</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></math></p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(</span>
-<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a><span class="fu">rcond</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%-&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), (<span class="st">&#39;&amp;&#39;</span>(A, B)))), </span>
-<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a><span class="fu">rand</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), <span class="st">&#39;&amp;&#39;</span>(A, B)), </span>
-<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a><span class="fu">lor</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), A), </span>
-<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>    <span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(A, A), <span class="st">&#39;&#39;</span>), </span>
-<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a>    <span class="fu">asq</span>(B<span class="sc">%&lt;%</span>A, <span class="st">&#39;&#39;</span>)), </span>
-<span id="cb56-7"><a href="#cb56-7" tabindex="-1"></a><span class="fu">lor</span>(A<span class="sc">%|%</span>B<span class="sc">%&gt;%</span>B, </span>
-<span id="cb56-8"><a href="#cb56-8" tabindex="-1"></a>    <span class="fu">asq</span>(<span class="st">&#39;%&lt;%&#39;</span>(A, B), <span class="st">&#39;&#39;</span>), </span>
-<span id="cb56-9"><a href="#cb56-9" tabindex="-1"></a>    <span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(B, B), <span class="st">&#39;&#39;</span>)))))</span>
-<span id="cb56-10"><a href="#cb56-10" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(</span>
+<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a><span class="fu">rcond</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%-&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), (<span class="st">&#39;&amp;&#39;</span>(A, B)))), </span>
+<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a><span class="fu">rand</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), <span class="st">&#39;&amp;&#39;</span>(A, B)), </span>
+<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a><span class="fu">lor</span>(<span class="st">&#39;%&gt;%&#39;</span>(<span class="st">&#39;%|%&#39;</span>(A, B), A), </span>
+<span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a>    <span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(A, A), <span class="st">&#39;&#39;</span>), </span>
+<span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a>    <span class="fu">asq</span>(B<span class="sc">%&lt;%</span>A, <span class="st">&#39;&#39;</span>)), </span>
+<span id="cb58-7"><a href="#cb58-7" tabindex="-1"></a><span class="fu">lor</span>(A<span class="sc">%|%</span>B<span class="sc">%&gt;%</span>B, </span>
+<span id="cb58-8"><a href="#cb58-8" tabindex="-1"></a>    <span class="fu">asq</span>(<span class="st">&#39;%&lt;%&#39;</span>(A, B), <span class="st">&#39;&#39;</span>), </span>
+<span id="cb58-9"><a href="#cb58-9" tabindex="-1"></a>    <span class="fu">ax</span>(<span class="st">&#39;%&gt;%&#39;</span>(B, B), <span class="st">&#39;&#39;</span>)))))</span>
+<span id="cb58-10"><a href="#cb58-10" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>A</mi><mo>⊢</mo><mi>A</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Ax.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mi></mi></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow mathcolor="red"><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>B</mi><mo>⊬</mo><mi>A</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Asq.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>⊢</mo><mi>A</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>L</mi><mo>∨</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mi></mi></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow mathcolor="red"><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>A</mi><mo>⊬</mo><mi>B</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Asq.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mi></mi></mrow></mtd><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mrow><mrow><mtable align="top 2" rowlines="solid" framespacing="0 0" semantics="bspr_inferenceRule:down"><mtr><mtd><mrow><mtable framespacing="0 0"><mtr><mtd rowalign="bottom"><mrow semantics="bspr_inference:1;bspr_labelledRule:right"><mtext></mtext></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mi>B</mi><mo>⊢</mo><mi>B</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mi mathvariant="italic">Ax.</mi></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>⊢</mo><mi>B</mi></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>L</mi><mo>∨</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>⊢</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>R</mi><mo>∧</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></mrow></mtd></mtr></mtable></mrow></mtd></mtr><mtr><mtd><mrow><mspace width=".5ex"><mstyle displaystyle="false" scriptlevel="0"><mrow><mo>⊢</mo><mrow><mrow><mo>(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>)</mo></mrow><mo>→</mo><mrow><mo>(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo>)</mo></mrow></mrow></mrow></mstyle></mspace></mrow></mtd></mtr></mtable></mrow><mpadded height=".5em" width=".5em" voffset=".9em" semantics="bspr_prooflabel:right"><mstyle displaystyle="false" scriptlevel="0"><mstyle mathsize="0.7em"><mrow><mi>R</mi><mo>→</mo><mi></mi></mrow></mstyle></mstyle></mpadded></mrow></math></p>
 </div>
 <div id="p-values" class="section level2">
 <h2>P-values</h2>
-<p>With pval/2, a value specified as first argument can be displayed
-with the following rounding rules:</p>
+<p>With <code>pval/2</code>, a value specified as first argument can be
+displayed with the following rounding rules:</p>
 <ul>
 <li>0.1 &lt; value &lt; 1 : two digits<br />
 </li>
 <li>0.001 &lt; value &lt; 0.1 : three digits<br />
 </li>
-<li>value &lt; 0.0001 : output defaults to “&lt; 0.0001”.</li>
+<li>value &lt; 0.001 : output defaults to “&lt; 0.001”.</li>
 </ul>
-<p>The identifier for the value is provided as second argument.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a><span class="fu">library</span>(mathml)</span>
-<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;pval.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
-<span id="cb57-3"><a href="#cb57-3" tabindex="-1"></a></span>
-<span id="cb57-4"><a href="#cb57-4" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.539</span>, P))</span>
-<span id="cb57-5"><a href="#cb57-5" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<p>The identifier, typically <span class="math inline">\(p\)</span> or
+<span class="math inline">\(P\)</span>, is provided as the second
+argument.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a><span class="fu">library</span>(mathml)</span>
+<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>rolog<span class="sc">::</span><span class="fu">consult</span>(<span class="fu">system.file</span>(<span class="fu">file.path</span>(<span class="st">&quot;pl&quot;</span>, <span class="st">&quot;pval.pl&quot;</span>), <span class="at">package=</span><span class="st">&quot;mathml&quot;</span>))</span>
+<span id="cb59-3"><a href="#cb59-3" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.539</span>, P))</span>
+<span id="cb59-5"><a href="#cb59-5" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>P</mi><mo>=</mo><mn>0.54</mn></mrow></math></p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.0137</span>, p))</span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.0137</span>, p))</span>
+<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>p</mi><mo>=</mo><mn>0.014</mn></mrow></math></p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.0003</span>, P))</span>
-<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a>term <span class="ot">&lt;-</span> <span class="fu">quote</span>(<span class="fu">pval</span>(<span class="fl">0.0003</span>, P))</span>
+<span id="cb61-2"><a href="#cb61-2" tabindex="-1"></a><span class="fu">math</span>(term)</span></code></pre></div>
 <p><math><mrow><mi>P</mi><mo>&lt;</mo><mn>0.001</mn></mrow></math></p>
 <p>The file <code>prolog/pval.pl</code> illustrates how to distinguish
 the above cases in Prolog. Two nested <code>math_hook</code> macros are
 used to decide if an equation sign is needed or the less-than sign, and
 to determine the number of decimal places shown.</p>
+<p>The file also includes the convenience function <code>tstat/1</code>
+that rounds to two digits, and <code>percent/1</code> that displays a
+number as a percentage (e.g., 0.05 as 5%).</p>
 </div>
 </div>
 <div id="acknowledgment" class="section level1">
@@ -1440,7 +1448,7 @@ Wielemaker, Jan, Tom Schrijvers, Markus Triska, and Torbjörn Lager.
 Logic Programming</em> 12 (1-2): 67–96.
 </div>
 <div id="ref-Xie2020" class="csl-entry">
-Xie, Y., C. Dervieux, and E. Riederer. 2020. <em>R Markdown
+Xie, Y., C. Dervieux, and E. Riederer. 2020. <em>RMarkdown
 Cookbook</em>. Cambridge: Chapman and Hall/CRC.
 </div>
 <div id="ref-knitr" class="csl-entry">
@@ -1448,7 +1456,7 @@ Xie, Yihui. 2023. <em>Knitr: A General-Purpose Package for Dynamic
 Report Generation in r</em>. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-Xie2018" class="csl-entry">
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown:
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>RMarkdown:
 The Definitive Guide</em>. Boca Raton, Florida: Chapman and Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.
 </div>
 </div>
