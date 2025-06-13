@@ -247,6 +247,16 @@ unhook(pbinom(.K, .N, .P))
 math(term)
 
 ## -----------------------------------------------------------------------------
+square <- function(x)
+{ 
+  return(x^2L) 
+}
+
+hook_fn(square)
+term <- quote(square(a))
+math(term)
+
+## -----------------------------------------------------------------------------
 hook(m_A, mean(X)["A"]) ; hook(s2_A, s["A"]^2L) ;
 hook(n_A, n["A"])
 hook(m_B, mean(X)["B"]) ; hook(s2_B, s["B"]^2L)
@@ -332,31 +342,10 @@ math(term)
 ## -----------------------------------------------------------------------------
 rolog::consult(system.file(file.path("pl", "nthroot.pl"), package="mathml"))
 
+options(digits = 2)
 term <- quote(nthroot(a * (b + c), 3L)^2L)
 math(term)
 term <- quote(a^(1L/3L) + a^{1L/3L} + a^(1.0/3L))
-math(term)
-
-## -----------------------------------------------------------------------------
-rolog::consult(system.file(file.path("pl", "bussproofs.pl"), package="mathml"))
-
-term <- quote(rcond('%>%'(P %->% P), ax(P %>% P, '')))
-math(term)
-
-term <- quote(ror('%>%'('', '%|%'(A, ~A)), 
-rneg('%>%'('', '%,%'(A, ~A)), 
-ax('%>%'(A, A), ''))))
-math(term)
-
-term <- quote(
-rcond('%>%'('%->%'('%|%'(A, B), ('&'(A, B)))), 
-rand('%>%'('%|%'(A, B), '&'(A, B)), 
-lor('%>%'('%|%'(A, B), A), 
-    ax('%>%'(A, A), ''), 
-    asq(B%<%A, '')), 
-lor(A%|%B%>%B, 
-    asq('%<%'(A, B), ''), 
-    ax('%>%'(B, B), '')))))
 math(term)
 
 ## -----------------------------------------------------------------------------
