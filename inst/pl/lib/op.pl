@@ -1676,7 +1676,7 @@ math('%|%'(A, B), X)
 
 math(~(A), X)
  => current_op(Prec, fy, \+),
-    X = fy(Prec, ~, A).
+    X = fy(Prec, 'Tilde', A).
 
 math(A > B, X)
  => current_op(Prec, xfx, >),
