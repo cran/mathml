@@ -247,14 +247,19 @@ unhook(pbinom(.K, .N, .P))
 math(term)
 
 ## -----------------------------------------------------------------------------
-square <- function(x)
-{ 
-  return(x^2L) 
-}
+pretty <- function(n1, v1, n2, v2)
+  dfrac(nodot((n1 - 1L), v1) + nodot((n2 - 1L), v2), n1 + n2 - 2L)
+hook(pretty)
+math(quote(pretty(n["A"], s["A"]^2L, n["B"], s["B"]^2L)))
 
-hook_fn(square)
-term <- quote(square(a))
-math(term)
+ugly <- function(n1, v1, n2, v2)
+{
+  v1 = v1*(n1 - 1)
+  v2 = v2*(n2 - 1)
+  return((v1 + v2) / (n1 + n2 - 2))
+}
+hook(ugly)
+math(quote(ugly(n["A"], s["A"]^2L, n["B"], s["B"]^2L)))
 
 ## -----------------------------------------------------------------------------
 hook(m_A, mean(X)["A"]) ; hook(s2_A, s["A"]^2L) ;

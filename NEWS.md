@@ -1,3 +1,9 @@
+# mathml 1.8
+
+* hook(fn) renders function body of a custom function
+* use ensuremath instead of dollar-dollar
+* avoid unnecessary parentheses in -a*b
+
 # mathml 1.7
 
 * resubmission, since package was archived due to missing dependencies
