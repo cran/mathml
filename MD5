@@ -1,12 +1,12 @@
-5657e60e1d070db96651cb8f4709b9f9 *DESCRIPTION
+3bcf4de128624c6ab343f8a7c978d2cb *DESCRIPTION
 185de58977a7447b87682a3368e46050 *NAMESPACE
-f4a6a130be5ccd057ce324feb39bd95f *NEWS.md
+4a3ac97edcc05e1f80d63ae420e276a0 *NEWS.md
 af77d056bfc6c68adea314a6b2b9c693 *R/mathml.R
 f04c190eea998f58f92801ab1b4e3d8b *README.md
-7a856c91699cb167be65b80ea807a7f7 *build/vignette.rds
+35330eead4fc2881a44e9e30cc5d1d07 *build/vignette.rds
 dc9366c71de0c0d37d75bca2d5bbfcce *inst/doc/mathml.R
 515632294a9ea90877a45e722f0f4acb *inst/doc/mathml.Rmd
-488fbe2f5f669b43fab252c948896a4e *inst/doc/mathml.html
+b5497a078cb377ce255812d60dd435c1 *inst/doc/mathml.html
 0219d0911cd167b564d2d3cf6d44c974 *inst/pl/lib/main.pl
 0d3073a5c9709bc697d619151cc28f82 *inst/pl/lib/op.pl
 b2bc59731e1939b422b9b1c00685b5b7 *inst/pl/lm.pl
@@ -57,5 +57,5 @@ aab08644a7b96a20e5f3de8cac10f6dd *man/mathout.Rd
 468d5c76bc1f80a419a7d8c499851c6c *tests/testthat.R
 a8f2d5aaa11efc7d1bbd9bb75d419994 *tests/testthat/test-appendix.R
 a483583c698b0b47bc576394509d91ff *tests/testthat/test-mathml.R
-9cd2ddd2375d16c982fb00f59f7f1c7a *vignettes/bibliography.bibtex
+e2c7cddda7fc6e841ea4cf525042e1c3 *vignettes/bibliography.bibtex
 515632294a9ea90877a45e722f0f4acb *vignettes/mathml.Rmd
